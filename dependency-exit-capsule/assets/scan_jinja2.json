@@ -1,0 +1,27 @@
+{
+  "target_repo": "D:\\mlh\\LinkWatch",
+  "scan_timestamp": "2026-10-15T08:35:59.243731+00:00",
+  "total_dependencies": 1,
+  "dependencies": [
+    {
+      "package_name": "Jinja2",
+      "canonical_name": "jinja2",
+      "declared_specifier": "==2.11.3",
+      "source_file": "requirements.txt",
+      "pypi_verified": true,
+      "latest_version": "3.1.6",
+      "pypi_url": "https://pypi.org/project/Jinja2/",
+      "last_release_date": "2025-03-05T20:05:02.478302+00:00",
+      "days_since_last_release": 588,
+      "yanked": false,
+      "yanked_reason": null,
+      "repository_url": "https://github.com/pallets/jinja",
+      "github_archived": false,
+      "github_last_push": "2025-06-14T20:35:04Z",
+      "days_since_last_push": 487,
+      "deprecation_signals": [],
+      "risk_status": "verified",
+      "notes": []
+    }
+  ]
+}

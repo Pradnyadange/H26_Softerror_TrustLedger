@@ -1,0 +1,338 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DependencyExitCapsule",
+  "description": "Schema for a Dependency Exit Capsule documenting empirical observation and AI-assisted migration recommendations for an at-risk dependency.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "capsule_id",
+    "generated_at",
+    "target_repo",
+    "target_dependency",
+    "observed",
+    "ai_generated"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "capsule_id": {
+      "type": "string",
+      "description": "Unique identifier for the capsule, e.g. capsule-linkwatch-toml-20261015"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of capsule generation"
+    },
+    "target_repo": {
+      "type": "object",
+      "required": ["name", "path", "python_version"],
+      "properties": {
+        "name": { "type": "string" },
+        "path": { "type": "string" },
+        "url": { "type": ["string", "null"] },
+        "python_version": { "type": "string" }
+      }
+    },
+    "target_dependency": {
+      "type": "object",
+      "required": ["name", "declared_specifier", "source_file"],
+      "properties": {
+        "name": { "type": "string" },
+        "declared_specifier": { "type": "string" },
+        "source_file": { "type": "string" },
+        "latest_pypi_version": { "type": ["string", "null"] },
+        "pypi_url": { "type": ["string", "null"] },
+        "repository_url": { "type": ["string", "null"] }
+      }
+    },
+    "observed": {
+      "type": "object",
+      "description": "Empirical data collected strictly through scripts, static AST analysis, package registries, and execution in isolated virtual environments. No AI-generated content allowed.",
+      "required": [
+        "risk_indicators",
+        "usage_locations",
+        "executed_test_results"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "risk_indicators": {
+          "type": "object",
+          "required": [
+            "status",
+            "last_release_date",
+            "days_since_last_release",
+            "yanked",
+            "github_archived",
+            "github_last_push",
+            "days_since_last_push",
+            "deprecation_signals"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["verified", "unverified", "not_testable"]
+            },
+            "last_release_date": { "type": ["string", "null"] },
+            "days_since_last_release": { "type": ["integer", "null"] },
+            "yanked": { "type": "boolean" },
+            "yanked_reason": { "type": ["string", "null"] },
+            "github_archived": { "type": ["boolean", "null"] },
+            "github_last_push": { "type": ["string", "null"] },
+            "days_since_last_push": { "type": ["integer", "null"] },
+            "deprecation_signals": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "api_notes": { "type": ["string", "null"] }
+          }
+        },
+        "usage_locations": {
+          "type": "object",
+          "required": [
+            "status",
+            "total_occurrences",
+            "dynamic_imports_detected",
+            "imports",
+            "calls"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["verified", "unverified", "not_testable"]
+            },
+            "total_occurrences": { "type": "integer" },
+            "dynamic_imports_detected": { "type": "boolean" },
+            "imports": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["file", "line", "imported_symbol", "alias", "is_dynamic", "status"],
+                "properties": {
+                  "file": { "type": "string" },
+                  "line": { "type": "integer" },
+                  "imported_symbol": { "type": "string" },
+                  "alias": { "type": ["string", "null"] },
+                  "is_dynamic": { "type": "boolean" },
+                  "status": {
+                    "type": "string",
+                    "enum": ["verified", "unverified", "not_testable"]
+                  }
+                }
+              }
+            },
+            "calls": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["file", "line", "call_expression", "status"],
+                "properties": {
+                  "file": { "type": "string" },
+                  "line": { "type": "integer" },
+                  "call_expression": { "type": "string" },
+                  "status": {
+                    "type": "string",
+                    "enum": ["verified", "unverified", "not_testable"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "executed_test_results": {
+          "type": "object",
+          "required": [
+            "status",
+            "baseline",
+            "replacement",
+            "diff"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["verified", "unverified", "not_testable"]
+            },
+            "baseline": {
+              "type": "object",
+              "required": ["exit_code", "total", "passed", "failed", "errors", "skipped", "duration_seconds", "failures"],
+              "properties": {
+                "exit_code": { "type": "integer" },
+                "total": { "type": "integer" },
+                "passed": { "type": "integer" },
+                "failed": { "type": "integer" },
+                "errors": { "type": "integer" },
+                "skipped": { "type": "integer" },
+                "duration_seconds": { "type": "number" },
+                "failures": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            },
+            "replacement": {
+              "type": ["object", "null"],
+              "required": ["exit_code", "total", "passed", "failed", "errors", "skipped", "duration_seconds", "failures"],
+              "properties": {
+                "exit_code": { "type": "integer" },
+                "total": { "type": "integer" },
+                "passed": { "type": "integer" },
+                "failed": { "type": "integer" },
+                "errors": { "type": "integer" },
+                "skipped": { "type": "integer" },
+                "duration_seconds": { "type": "number" },
+                "failures": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            },
+            "diff": {
+              "type": "object",
+              "required": ["status", "new_failures_attributable_to_replacement", "resolved_failures", "notes"],
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": ["verified", "unverified", "not_testable"]
+                },
+                "new_failures_attributable_to_replacement": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "resolved_failures": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "notes": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ai_generated": {
+      "type": "object",
+      "description": "Model outputs including proposed replacements, migration guidance, gap analysis, and model metadata.",
+      "required": [
+        "model_metadata",
+        "proposed_replacement",
+        "migration_steps",
+        "suggested_tests",
+        "compatibility_gaps",
+        "open_concerns_and_limitations"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "model_metadata": {
+          "type": "object",
+          "required": ["name", "version", "access_method", "license"],
+          "properties": {
+            "name": { "type": "string" },
+            "version": { "type": "string" },
+            "access_method": { "type": "string" },
+            "license": { "type": "string" }
+          }
+        },
+        "proposed_replacement": {
+          "type": "object",
+          "required": ["package_name", "type", "validation", "rationale"],
+          "properties": {
+            "package_name": { "type": "string" },
+            "type": {
+              "type": "string",
+              "enum": ["stdlib", "pypi", "internal", "none"]
+            },
+            "version_specifier": { "type": ["string", "null"] },
+            "rationale": { "type": "string" },
+            "validation": {
+              "type": "object",
+              "required": ["status", "is_valid", "validation_source"],
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": ["verified", "unverified", "not_testable"]
+                },
+                "is_valid": { "type": "boolean" },
+                "validation_source": {
+                  "type": "string",
+                  "enum": ["sys.stdlib_module_names", "pypi", "none"]
+                },
+                "details": { "type": ["string", "null"] }
+              }
+            }
+          }
+        },
+        "migration_steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["step_number", "title", "description", "diff_snippet", "status"],
+            "properties": {
+              "step_number": { "type": "integer" },
+              "title": { "type": "string" },
+              "description": { "type": "string" },
+              "diff_snippet": { "type": ["string", "null"] },
+              "status": {
+                "type": "string",
+                "enum": ["verified", "unverified", "not_testable"]
+              }
+            }
+          }
+        },
+        "suggested_tests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["test_name", "description", "code_snippet", "status"],
+            "properties": {
+              "test_name": { "type": "string" },
+              "description": { "type": "string" },
+              "code_snippet": { "type": "string" },
+              "status": {
+                "type": "string",
+                "enum": ["verified", "unverified", "not_testable"]
+              }
+            }
+          }
+        },
+        "compatibility_gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["area", "description", "mitigation", "status"],
+            "properties": {
+              "area": { "type": "string" },
+              "description": { "type": "string" },
+              "mitigation": { "type": ["string", "null"] },
+              "status": {
+                "type": "string",
+                "enum": ["verified", "unverified", "not_testable"]
+              }
+            }
+          }
+        },
+        "open_concerns_and_limitations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["title", "description", "severity", "status"],
+            "properties": {
+              "title": { "type": "string" },
+              "description": { "type": "string" },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"]
+              },
+              "status": {
+                "type": "string",
+                "enum": ["verified", "unverified", "not_testable"]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

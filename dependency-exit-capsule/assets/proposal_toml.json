@@ -1,0 +1,73 @@
+{
+  "model_metadata": {
+    "name": "gemma-2-9b-reference",
+    "version": "9b",
+    "access_method": "reference_expert",
+    "license": "Gemma Terms of Use"
+  },
+  "proposed_replacement": {
+    "package_name": "tomllib",
+    "type": "stdlib",
+    "version_specifier": null,
+    "rationale": "Python 3.11+ includes tomllib in the standard library (PEP 680), eliminating third-party unmaintained TOML dependencies.",
+    "validation": {
+      "status": "verified",
+      "is_valid": true,
+      "validation_source": "sys.stdlib_module_names",
+      "details": "Module 'tomllib' verified in Python 3.12 standard library."
+    }
+  },
+  "migration_steps": [
+    {
+      "step_number": 1,
+      "title": "Replace imports in config loader",
+      "description": "Change 'import toml' to 'import tomllib' in linkwatch/config.py.",
+      "diff_snippet": "-import toml\n+import tomllib",
+      "status": "unverified"
+    },
+    {
+      "step_number": 2,
+      "title": "Update toml.load call to binary file handle",
+      "description": "tomllib.load requires a binary read mode file descriptor ('rb') rather than taking a string path.",
+      "diff_snippet": "-    data = toml.load(path)\n+    with open(path, 'rb') as f:\n+        data = tomllib.load(f)",
+      "status": "unverified"
+    },
+    {
+      "step_number": 3,
+      "title": "Remove toml from requirements.txt and pyproject.toml",
+      "description": "Remove toml==0.10.2 from requirements.txt and pyproject.toml dependencies.",
+      "diff_snippet": "-toml==0.10.2",
+      "status": "unverified"
+    }
+  ],
+  "suggested_tests": [
+    {
+      "test_name": "test_load_settings_tomllib",
+      "description": "Verify that load_settings successfully parses sites.toml with tomllib and preserves all data keys.",
+      "code_snippet": "def test_load_settings_tomllib(tmp_path):\n    toml_file = tmp_path / 'sites.toml'\n    toml_file.write_text('[linkwatch]\\ntitle = \"test\"\\n[[linkwatch.sites]]\\nname = \"example\"\\nurl = \"https://example.com\"', encoding='utf-8')\n    from linkwatch.config import load_settings\n    s = load_settings(str(toml_file))\n    assert s.title == 'test'\n",
+      "status": "unverified"
+    }
+  ],
+  "compatibility_gaps": [
+    {
+      "area": "File Mode",
+      "description": "toml.load accepted a file path string or text handle. tomllib.load strictly requires a binary file handle opened with mode 'rb'.",
+      "mitigation": "Wrap the file reading with 'with open(path, \"rb\") as f: tomllib.load(f)'.",
+      "status": "unverified"
+    },
+    {
+      "area": "Write Support",
+      "description": "tomllib is read-only and does not implement a dump() function.",
+      "mitigation": "Verified that codebase only performs reads (load), so write support is not required.",
+      "status": "unverified"
+    }
+  ],
+  "open_concerns_and_limitations": [
+    {
+      "title": "Minimum Python Version",
+      "description": "tomllib requires Python >= 3.11. If backwards compatibility with Python 3.10 is required, tomli must be used as a conditional fallback.",
+      "severity": "low",
+      "status": "unverified"
+    }
+  ]
+}

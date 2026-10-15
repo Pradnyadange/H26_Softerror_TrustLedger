@@ -1,0 +1,64 @@
+{
+  "target_dependency": "jinja2,markupsafe",
+  "target_repo": "D:\\mlh\\LinkWatch",
+  "usage": {
+    "status": "verified",
+    "total_occurrences": 6,
+    "dynamic_imports_detected": false,
+    "imports": [
+      {
+        "file": "linkwatch/report.py",
+        "line": 3,
+        "target_dependency": "jinja2",
+        "imported_symbol": "jinja2.Environment",
+        "alias": null,
+        "is_dynamic": false,
+        "status": "verified"
+      },
+      {
+        "file": "linkwatch/report.py",
+        "line": 3,
+        "target_dependency": "jinja2",
+        "imported_symbol": "jinja2.FileSystemLoader",
+        "alias": null,
+        "is_dynamic": false,
+        "status": "verified"
+      },
+      {
+        "file": "linkwatch/report.py",
+        "line": 3,
+        "target_dependency": "jinja2",
+        "imported_symbol": "jinja2.select_autoescape",
+        "alias": null,
+        "is_dynamic": false,
+        "status": "verified"
+      }
+    ],
+    "calls": [
+      {
+        "file": "linkwatch/report.py",
+        "line": 9,
+        "target_dependency": "jinja2",
+        "call_expression": "Environment(loader=FileSystemLoader(template_dir()), autoescape=select_autoescape(['html', 'j2']))",
+        "resolved_symbol": "jinja2.Environment",
+        "status": "verified"
+      },
+      {
+        "file": "linkwatch/report.py",
+        "line": 10,
+        "target_dependency": "jinja2",
+        "call_expression": "FileSystemLoader(template_dir())",
+        "resolved_symbol": "jinja2.FileSystemLoader",
+        "status": "verified"
+      },
+      {
+        "file": "linkwatch/report.py",
+        "line": 11,
+        "target_dependency": "jinja2",
+        "call_expression": "select_autoescape(['html', 'j2'])",
+        "resolved_symbol": "jinja2.select_autoescape",
+        "status": "verified"
+      }
+    ]
+  }
+}

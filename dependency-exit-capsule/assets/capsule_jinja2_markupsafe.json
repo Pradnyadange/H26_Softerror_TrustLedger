@@ -1,0 +1,179 @@
+{
+  "schema_version": "1.0.0",
+  "capsule_id": "capsule-linkwatch-jinja2-202610150854",
+  "generated_at": "2026-10-15T08:54:02.842302+00:00",
+  "target_repo": {
+    "name": "LinkWatch",
+    "path": "D:\\mlh\\LinkWatch",
+    "url": "https://github.com/rishrek/LinkWatch",
+    "python_version": "3.12"
+  },
+  "target_dependency": {
+    "name": "Jinja2",
+    "declared_specifier": "==2.11.3",
+    "source_file": "requirements.txt",
+    "latest_pypi_version": "3.1.6",
+    "pypi_url": "https://pypi.org/project/Jinja2/",
+    "repository_url": "https://github.com/pallets/jinja"
+  },
+  "observed": {
+    "risk_indicators": {
+      "status": "verified",
+      "last_release_date": "2025-03-05T20:05:02.478302+00:00",
+      "days_since_last_release": 588,
+      "yanked": false,
+      "yanked_reason": null,
+      "github_archived": false,
+      "github_last_push": "2025-06-14T20:35:04Z",
+      "days_since_last_push": 487,
+      "deprecation_signals": [],
+      "api_notes": null
+    },
+    "usage_locations": {
+      "status": "verified",
+      "total_occurrences": 6,
+      "dynamic_imports_detected": false,
+      "imports": [
+        {
+          "file": "linkwatch/report.py",
+          "line": 3,
+          "target_dependency": "jinja2",
+          "imported_symbol": "jinja2.Environment",
+          "alias": null,
+          "is_dynamic": false,
+          "status": "verified"
+        },
+        {
+          "file": "linkwatch/report.py",
+          "line": 3,
+          "target_dependency": "jinja2",
+          "imported_symbol": "jinja2.FileSystemLoader",
+          "alias": null,
+          "is_dynamic": false,
+          "status": "verified"
+        },
+        {
+          "file": "linkwatch/report.py",
+          "line": 3,
+          "target_dependency": "jinja2",
+          "imported_symbol": "jinja2.select_autoescape",
+          "alias": null,
+          "is_dynamic": false,
+          "status": "verified"
+        }
+      ],
+      "calls": [
+        {
+          "file": "linkwatch/report.py",
+          "line": 9,
+          "target_dependency": "jinja2",
+          "call_expression": "Environment(loader=FileSystemLoader(template_dir()), autoescape=select_autoescape(['html', 'j2']))",
+          "resolved_symbol": "jinja2.Environment",
+          "status": "verified"
+        },
+        {
+          "file": "linkwatch/report.py",
+          "line": 10,
+          "target_dependency": "jinja2",
+          "call_expression": "FileSystemLoader(template_dir())",
+          "resolved_symbol": "jinja2.FileSystemLoader",
+          "status": "verified"
+        },
+        {
+          "file": "linkwatch/report.py",
+          "line": 11,
+          "target_dependency": "jinja2",
+          "call_expression": "select_autoescape(['html', 'j2'])",
+          "resolved_symbol": "jinja2.select_autoescape",
+          "status": "verified"
+        }
+      ]
+    },
+    "executed_test_results": {
+      "status": "verified",
+      "baseline": {
+        "total": 10,
+        "passed": 9,
+        "failed": 1,
+        "errors": 0,
+        "skipped": 0,
+        "duration_seconds": 10.533,
+        "failures": [
+          "tests.test_report::test_report_renders_all_sites"
+        ],
+        "exit_code": 1
+      },
+      "replacement": {
+        "total": 10,
+        "passed": 10,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "duration_seconds": 10.5,
+        "failures": [],
+        "exit_code": 0
+      },
+      "diff": {
+        "status": "verified",
+        "new_failures_attributable_to_replacement": [],
+        "resolved_failures": [
+          "tests.test_report::test_report_renders_all_sites"
+        ],
+        "notes": "Differential analysis executed 10 baseline tests vs 10 replacement tests. Found 0 new failure(s) attributable to replacement, and 1 resolved failure(s)."
+      }
+    }
+  },
+  "ai_generated": {
+    "model_metadata": {
+      "name": "llama3.2:3b",
+      "version": "3b",
+      "access_method": "ollama (http://localhost:11434/api/generate)",
+      "license": "Llama 3.2 Community License Agreement"
+    },
+    "proposed_replacement": {
+      "package_name": "jinja2",
+      "type": "pypi",
+      "version_specifier": null,
+      "rationale": "Jinja2 is the preferred templating engine for Python and is widely used in the community.",
+      "validation": {
+        "status": "verified",
+        "is_valid": true,
+        "validation_source": "pypi",
+        "details": "Package 'jinja2' verified on PyPI (latest: 3.1.6)."
+      }
+    },
+    "migration_steps": [
+      {
+        "step_number": 1,
+        "title": "Update Jinja2 to use soft_unicode",
+        "description": "Jinja2's soft_unicode has been deprecated and removed. Update the import to use the new version.",
+        "diff_snippet": "from jinja2 import Environment\n# Update to use soft_unicode\nenv = Environment(loader=FileSystemLoader(template_dir()), autoescape=select_autoescape(['html', 'j2']))",
+        "status": "unverified"
+      }
+    ],
+    "suggested_tests": [
+      {
+        "test_name": "test_report_renders_all_sites",
+        "description": "Verify that the templating engine renders all sites correctly",
+        "code_snippet": "import pytest\nfrom jinja2 import Environment\n# Create a new environment\nenv = Environment(loader=FileSystemLoader(''), autoescape=select_autoescape(['html', 'j2']))\n# Render a template\ntemplate = env.from_string('<html>Hello World!</html>')\nassert template == '<html>Hello World!</html>'",
+        "status": "unverified"
+      }
+    ],
+    "compatibility_gaps": [
+      {
+        "area": "MarkupSafe",
+        "description": "MarkupSafe has been removed and no longer supports soft_unicode.",
+        "mitigation": "Upgrade MarkupSafe to >=3.1.2,<4.0.0 to ensure compatibility.",
+        "status": "unverified"
+      }
+    ],
+    "open_concerns_and_limitations": [
+      {
+        "title": "No other alternatives",
+        "description": "No other templating engines are widely used in the community, making Jinja2 the best choice.",
+        "severity": "low",
+        "status": "unverified"
+      }
+    ]
+  }
+}

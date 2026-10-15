@@ -1,0 +1,28 @@
+{
+  "target_dependency": "appdirs",
+  "target_repo": "D:\\mlh\\LinkWatch",
+  "usage": {
+    "status": "verified",
+    "total_occurrences": 2,
+    "dynamic_imports_detected": false,
+    "imports": [
+      {
+        "file": "linkwatch/cache.py",
+        "line": 4,
+        "imported_symbol": "appdirs.user_cache_dir",
+        "alias": null,
+        "is_dynamic": false,
+        "status": "verified"
+      }
+    ],
+    "calls": [
+      {
+        "file": "linkwatch/cache.py",
+        "line": 10,
+        "call_expression": "user_cache_dir('linkwatch')",
+        "resolved_symbol": "appdirs.user_cache_dir",
+        "status": "verified"
+      }
+    ]
+  }
+}

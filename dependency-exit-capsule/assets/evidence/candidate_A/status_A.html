@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LinkWatch Status status</title>
+  <style>
+    body { font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif; margin: 2rem auto; max-width: 960px; padding: 0 1rem; color: #222; }
+    h1 { margin-bottom: 0.2rem; }
+    .summary { color: #666; margin-top: 0; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #ddd; }
+    .up { color: #1a7f37; font-weight: bold; }
+    .down { color: #cf222e; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>LinkWatch Status</h1>
+  <p class="summary">1 up, 1 down &middot; generated 2026-10-15 12:00</p>
+  <table>
+    <thead>
+      <tr><th>Site</th><th>Status</th><th>Code</th><th>Response time</th><th>Title</th><th>Last modified</th><th>Checked</th></tr>
+    </thead>
+    <tbody>
+    
+      <tr>
+        <td><a href="http://a.test">alpha</a></td>
+        <td class="up">UP</td>
+        <td>200</td>
+        <td>12 ms</td>
+        <td>Alpha</td>
+        <td>-</td>
+        <td>2022-03-01T10:00:00+00:00</td>
+      </tr>
+    
+      <tr>
+        <td><a href="http://b.test">beta</a></td>
+        <td class="down">DOWN</td>
+        <td>connection error</td>
+        <td>-</td>
+        <td></td>
+        <td>-</td>
+        <td>2022-03-01T10:00:00+00:00</td>
+      </tr>
+    
+    </tbody>
+  </table>
+</body>
+</html>

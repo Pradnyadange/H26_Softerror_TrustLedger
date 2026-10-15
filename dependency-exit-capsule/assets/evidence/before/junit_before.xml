@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="10" time="9.261" timestamp="2026-10-15T14:02:42.051275+05:30" hostname="DESKTOP-S2ESVPT"><testcase classname="tests.test_cache" name="test_cache_round_trip" time="0.019" /><testcase classname="tests.test_checker" name="test_ok_is_up" time="0.028" /><testcase classname="tests.test_checker" name="test_missing_is_down" time="0.005" /><testcase classname="tests.test_checker" name="test_redirect_is_up" time="0.008" /><testcase classname="tests.test_checker" name="test_slow_is_up" time="6.007" /><testcase classname="tests.test_checker" name="test_closed_port_is_down" time="2.059" /><testcase classname="tests.test_checker" name="test_latin1_title" time="0.018" /><testcase classname="tests.test_checker" name="test_user_agent" time="0.011" /><testcase classname="tests.test_config" name="test_sites_file_loads" time="0.006" /><testcase classname="tests.test_report" name="test_report_renders_all_sites" time="0.284"><failure message="ImportError: cannot import name 'soft_unicode' from 'markupsafe' (D:\mlh\dependency-exit-capsule\assets\evidence\before\venv_baseline\Lib\site-packages\markupsafe\__init__.py)">tmp_path = WindowsPath('C:/Users/pradn/AppData/Local/Temp/pytest-of-pradn/pytest-11/test_report_renders_all_sites0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000153E477AD20&gt;
+
+    def test_report_renders_all_sites(tmp_path, monkeypatch):
+        monkeypatch.setenv("LINKWATCH_CACHE_DIR", str(tmp_path))
+        cache.save_results(RESULTS)
+        output = tmp_path / "status.html"
+&gt;       result = CliRunner().invoke(cli, ["report", "-o", str(output)], catch_exceptions=False)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_report.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\dependency-exit-capsule\assets\evidence\before\venv_baseline\Lib\site-packages\click\testing.py:687: in invoke
+    return_value = cli.main(args=args or (), prog_name=prog_name, **extra)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\dependency-exit-capsule\assets\evidence\before\venv_baseline\Lib\site-packages\click\core.py:1552: in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+..\dependency-exit-capsule\assets\evidence\before\venv_baseline\Lib\site-packages\click\core.py:2032: in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\dependency-exit-capsule\assets\evidence\before\venv_baseline\Lib\site-packages\click\core.py:1415: in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\dependency-exit-capsule\assets\evidence\before\venv_baseline\Lib\site-packages\click\core.py:910: in invoke
+    return callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+linkwatch\cli.py:56: in report
+    from .report import render_report
+linkwatch\report.py:3: in &lt;module&gt;
+    from jinja2 import Environment, FileSystemLoader, select_autoescape
+..\dependency-exit-capsule\assets\evidence\before\venv_baseline\Lib\site-packages\jinja2\__init__.py:12: in &lt;module&gt;
+    from .environment import Environment
+..\dependency-exit-capsule\assets\evidence\before\venv_baseline\Lib\site-packages\jinja2\environment.py:25: in &lt;module&gt;
+    from .defaults import BLOCK_END_STRING
+..\dependency-exit-capsule\assets\evidence\before\venv_baseline\Lib\site-packages\jinja2\defaults.py:3: in &lt;module&gt;
+    from .filters import FILTERS as DEFAULT_FILTERS  # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    # -*- coding: utf-8 -*-
+    """Built-in template filters used with the ``|`` operator."""
+    import math
+    import random
+    import re
+    import warnings
+    from collections import namedtuple
+    from itertools import chain
+    from itertools import groupby
+    
+    from markupsafe import escape
+    from markupsafe import Markup
+&gt;   from markupsafe import soft_unicode
+E   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (D:\mlh\dependency-exit-capsule\assets\evidence\before\venv_baseline\Lib\site-packages\markupsafe\__init__.py)
+
+..\dependency-exit-capsule\assets\evidence\before\venv_baseline\Lib\site-packages\jinja2\filters.py:13: ImportError</failure></testcase></testsuite></testsuites>

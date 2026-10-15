@@ -1,0 +1,53 @@
+{
+  "model_metadata": {
+    "name": "llama3.2:3b",
+    "version": "3b",
+    "access_method": "ollama (http://localhost:11434/api/generate)",
+    "license": "Llama 3.2 Community License Agreement"
+  },
+  "proposed_replacement": {
+    "package_name": "jinja2",
+    "type": "pypi",
+    "version_specifier": null,
+    "rationale": "Jinja2 is the preferred templating engine for Python and is widely used in the community.",
+    "validation": {
+      "status": "verified",
+      "is_valid": true,
+      "validation_source": "pypi",
+      "details": "Package 'jinja2' verified on PyPI (latest: 3.1.6)."
+    }
+  },
+  "migration_steps": [
+    {
+      "step_number": 1,
+      "title": "Update Jinja2 to use soft_unicode",
+      "description": "Jinja2's soft_unicode has been deprecated and removed. Update the import to use the new version.",
+      "diff_snippet": "from jinja2 import Environment\n# Update to use soft_unicode\nenv = Environment(loader=FileSystemLoader(template_dir()), autoescape=select_autoescape(['html', 'j2']))",
+      "status": "unverified"
+    }
+  ],
+  "suggested_tests": [
+    {
+      "test_name": "test_report_renders_all_sites",
+      "description": "Verify that the templating engine renders all sites correctly",
+      "code_snippet": "import pytest\nfrom jinja2 import Environment\n# Create a new environment\nenv = Environment(loader=FileSystemLoader(''), autoescape=select_autoescape(['html', 'j2']))\n# Render a template\ntemplate = env.from_string('<html>Hello World!</html>')\nassert template == '<html>Hello World!</html>'",
+      "status": "unverified"
+    }
+  ],
+  "compatibility_gaps": [
+    {
+      "area": "MarkupSafe",
+      "description": "MarkupSafe has been removed and no longer supports soft_unicode.",
+      "mitigation": "Upgrade MarkupSafe to >=3.1.2,<4.0.0 to ensure compatibility.",
+      "status": "unverified"
+    }
+  ],
+  "open_concerns_and_limitations": [
+    {
+      "title": "No other alternatives",
+      "description": "No other templating engines are widely used in the community, making Jinja2 the best choice.",
+      "severity": "low",
+      "status": "unverified"
+    }
+  ]
+}

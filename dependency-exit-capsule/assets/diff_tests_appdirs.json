@@ -1,0 +1,33 @@
+{
+  "status": "verified",
+  "baseline": {
+    "total": 10,
+    "passed": 9,
+    "failed": 1,
+    "errors": 0,
+    "skipped": 0,
+    "duration_seconds": 9.309,
+    "failures": [
+      "tests.test_report::test_report_renders_all_sites"
+    ],
+    "exit_code": 1
+  },
+  "replacement": {
+    "total": 10,
+    "passed": 9,
+    "failed": 1,
+    "errors": 0,
+    "skipped": 0,
+    "duration_seconds": 9.331,
+    "failures": [
+      "tests.test_report::test_report_renders_all_sites"
+    ],
+    "exit_code": 1
+  },
+  "diff": {
+    "status": "verified",
+    "new_failures_attributable_to_replacement": [],
+    "resolved_failures": [],
+    "notes": "Differential analysis executed 10 baseline tests vs 10 replacement tests. Found 0 new failure(s) attributable to replacement, and 0 resolved failure(s)."
+  }
+}
