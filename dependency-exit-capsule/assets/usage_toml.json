@@ -9,6 +9,7 @@
       {
         "file": "linkwatch/config.py",
         "line": 3,
+        "target_dependency": "toml",
         "imported_symbol": "toml",
         "alias": null,
         "is_dynamic": false,
@@ -19,6 +20,7 @@
       {
         "file": "linkwatch/config.py",
         "line": 37,
+        "target_dependency": "toml",
         "call_expression": "toml.load(path)",
         "resolved_symbol": "toml.load",
         "status": "verified"

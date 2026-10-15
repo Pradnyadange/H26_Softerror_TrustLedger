@@ -1,11 +1,11 @@
 {
-  "schema_version": "1.0.0",
-  "capsule_id": "capsule-linkwatch-toml-202610150717",
-  "generated_at": "2026-10-15T07:17:47.724925+00:00",
+  "schema_version": "2.0.0",
+  "capsule_id": "capsule-linkwatch-toml-202610151042",
+  "generated_at": "2026-10-15T10:42:11.661084+00:00",
   "target_repo": {
     "name": "LinkWatch",
-    "path": "D:\\mlh\\LinkWatch",
-    "url": "https://github.com/rishrek/LinkWatch",
+    "url": "https://github.com/rishrek/LinkWatch.git",
+    "commit_sha": "f52f3930c8e7c33d934ccf614955a38e26984bd5",
     "python_version": "3.12"
   },
   "target_dependency": {
@@ -17,6 +17,50 @@
     "repository_url": "https://github.com/uiri/toml"
   },
   "observed": {
+    "evidence": [
+      {
+        "path": "capsule-linkwatch-toml-20261015/pytest_baseline.txt",
+        "sha256": "f3939fc893e55cb0ff2ed2ff5e246377ab07acd3a9280983f8b7ac3e0ecdab1e",
+        "command": "python -m pytest --junitxml=baseline_junit.xml",
+        "exit_code": 1,
+        "captured_at": "2026-10-15T10:41:34.928948+00:00"
+      },
+      {
+        "path": "capsule-linkwatch-toml-20261015/baseline_junit.xml",
+        "sha256": "5d0c36733b745b12c2ff05cbb2cd573503fc7ba90677f894680c44b702c9adb3",
+        "command": "python -m pytest --junitxml=baseline_junit.xml",
+        "exit_code": 1,
+        "captured_at": "2026-10-15T10:41:34.928948+00:00"
+      },
+      {
+        "path": "capsule-linkwatch-toml-20261015/pytest_replacement.txt",
+        "sha256": "943da647d4890fed5806b842a3e87f2d505148b43870dfe2070e0c3f91304f2e",
+        "command": "python -m pytest --junitxml=replacement_junit.xml",
+        "exit_code": 1,
+        "captured_at": "2026-10-15T10:41:57.070699+00:00"
+      },
+      {
+        "path": "capsule-linkwatch-toml-20261015/replacement_junit.xml",
+        "sha256": "c334f365bf11bde16226237a3a4d8248bf1e04d0522d4498a08659f5d8799d20",
+        "command": "python -m pytest --junitxml=replacement_junit.xml",
+        "exit_code": 1,
+        "captured_at": "2026-10-15T10:41:57.070699+00:00"
+      },
+      {
+        "path": "capsule-linkwatch-toml-20261015/pip_check_baseline.txt",
+        "sha256": "87a3ba1741f948d5592c4ac852b2d9fb82a1309a2129bb8186e83a3b6c30e423",
+        "command": "python -m pip check (venv_A)",
+        "exit_code": 1,
+        "captured_at": "2026-10-15T10:41:34.928948+00:00"
+      },
+      {
+        "path": "capsule-linkwatch-toml-20261015/pip_check_replacement.txt",
+        "sha256": "f8a5d97fcdc3141d628e3f898a0b56e86ddb67a5a5df3c4c06c5617a9763ee23",
+        "command": "python -m pip check (venv_B)",
+        "exit_code": 1,
+        "captured_at": "2026-10-15T10:41:57.070699+00:00"
+      }
+    ],
     "risk_indicators": {
       "status": "verified",
       "last_release_date": "2020-11-01T01:40:22.204866+00:00",
@@ -31,27 +75,10 @@
     },
     "usage_locations": {
       "status": "verified",
-      "total_occurrences": 2,
+      "total_occurrences": 0,
       "dynamic_imports_detected": false,
-      "imports": [
-        {
-          "file": "linkwatch/config.py",
-          "line": 3,
-          "imported_symbol": "toml",
-          "alias": null,
-          "is_dynamic": false,
-          "status": "verified"
-        }
-      ],
-      "calls": [
-        {
-          "file": "linkwatch/config.py",
-          "line": 37,
-          "call_expression": "toml.load(path)",
-          "resolved_symbol": "toml.load",
-          "status": "verified"
-        }
-      ]
+      "imports": [],
+      "calls": []
     },
     "executed_test_results": {
       "status": "verified",
@@ -61,11 +88,15 @@
         "failed": 1,
         "errors": 0,
         "skipped": 0,
-        "duration_seconds": 9.325,
+        "duration_seconds": 9.272,
         "failures": [
           "tests.test_report::test_report_renders_all_sites"
         ],
-        "exit_code": 1
+        "exit_code": 1,
+        "pip_check": {
+          "exit_code": 1,
+          "output": "C:\\Users\\pradn\\AppData\\Local\\Temp\\dep_capsule_diff_6dc01k8s\\venv_A\\Scripts\\python.exe: No module named pip"
+        }
       },
       "replacement": {
         "total": 10,
@@ -73,11 +104,15 @@
         "failed": 1,
         "errors": 0,
         "skipped": 0,
-        "duration_seconds": 9.23,
+        "duration_seconds": 9.275,
         "failures": [
           "tests.test_report::test_report_renders_all_sites"
         ],
-        "exit_code": 1
+        "exit_code": 1,
+        "pip_check": {
+          "exit_code": 1,
+          "output": "C:\\Users\\pradn\\AppData\\Local\\Temp\\dep_capsule_diff_6dc01k8s\\venv_B\\Scripts\\python.exe: No module named pip"
+        }
       },
       "diff": {
         "status": "verified",
@@ -88,74 +123,60 @@
     }
   },
   "ai_generated": {
-    "model_metadata": {
-      "name": "gemma-2-9b-reference",
-      "version": "9b",
-      "access_method": "reference_expert",
-      "license": "Gemma Terms of Use"
+    "provenance": {
+      "provider": "ollama",
+      "model_id": "llama3.2:3b",
+      "model_license_name": "Llama 3.2 Community License Agreement",
+      "model_card_url": "https://github.com/meta-llama/llama-models",
+      "prompt_sha256": "62c85add2a2c032407652af24ba4d432b4b078499bb6a405248edd66bde1a343",
+      "raw_response_path": "in_memory",
+      "validation": {
+        "passed": true,
+        "rejected_candidates": []
+      }
     },
     "proposed_replacement": {
       "package_name": "tomllib",
       "type": "stdlib",
       "version_specifier": null,
-      "rationale": "Python 3.11+ includes tomllib in the standard library (PEP 680), eliminating third-party unmaintained TOML dependencies.",
+      "rationale": "",
       "validation": {
         "status": "verified",
         "is_valid": true,
         "validation_source": "sys.stdlib_module_names",
-        "details": "Module 'tomllib' verified in Python 3.12 standard library."
+        "details": "Module 'tomllib' is verified in the Python 3.14 standard library catalog."
       }
     },
     "migration_steps": [
       {
         "step_number": 1,
-        "title": "Replace imports in config loader",
-        "description": "Change 'import toml' to 'import tomllib' in linkwatch/config.py.",
-        "diff_snippet": "-import toml\n+import tomllib",
-        "status": "unverified"
-      },
-      {
-        "step_number": 2,
-        "title": "Update toml.load call to binary file handle",
-        "description": "tomllib.load requires a binary read mode file descriptor ('rb') rather than taking a string path.",
-        "diff_snippet": "-    data = toml.load(path)\n+    with open(path, 'rb') as f:\n+        data = tomllib.load(f)",
-        "status": "unverified"
-      },
-      {
-        "step_number": 3,
-        "title": "Remove toml from requirements.txt and pyproject.toml",
-        "description": "Remove toml==0.10.2 from requirements.txt and pyproject.toml dependencies.",
-        "diff_snippet": "-toml==0.10.2",
+        "title": "Replace toml.load with tomllib.load",
+        "description": "Update the call expression to use tomllib.load instead of toml.load.\nExample:\n+ new_code = tomllib.load(path)",
+        "diff_snippet": "-toml.load(path)\n+ tomllib.load(path)",
         "status": "unverified"
       }
     ],
     "suggested_tests": [
       {
-        "test_name": "test_load_settings_tomllib",
-        "description": "Verify that load_settings successfully parses sites.toml with tomllib and preserves all data keys.",
-        "code_snippet": "def test_load_settings_tomllib(tmp_path):\n    toml_file = tmp_path / 'sites.toml'\n    toml_file.write_text('[linkwatch]\\ntitle = \"test\"\\n[[linkwatch.sites]]\\nname = \"example\"\\nurl = \"https://example.com\"', encoding='utf-8')\n    from linkwatch.config import load_settings\n    s = load_settings(str(toml_file))\n    assert s.title == 'test'\n",
+        "test_name": "test_tomllib_load",
+        "description": "Verify that tomllib.load works correctly for the same inputs as toml.load.",
+        "code_snippet": "def test_tomllib_load():\n    # your test code here",
         "status": "unverified"
       }
     ],
     "compatibility_gaps": [
       {
-        "area": "File Mode",
-        "description": "toml.load accepted a file path string or text handle. tomllib.load strictly requires a binary file handle opened with mode 'rb'.",
-        "mitigation": "Wrap the file reading with 'with open(path, \"rb\") as f: tomllib.load(f)'.",
-        "status": "unverified"
-      },
-      {
-        "area": "Write Support",
-        "description": "tomllib is read-only and does not implement a dump() function.",
-        "mitigation": "Verified that codebase only performs reads (load), so write support is not required.",
+        "area": "API",
+        "description": "The toml.load function has some differences in behavior and error handling compared to toml.load.",
+        "mitigation": "Update the test code to account for these differences, or use a library like toml-parser that provides a drop-in replacement.",
         "status": "unverified"
       }
     ],
     "open_concerns_and_limitations": [
       {
-        "title": "Minimum Python Version",
-        "description": "tomllib requires Python >= 3.11. If backwards compatibility with Python 3.10 is required, tomli must be used as a conditional fallback.",
-        "severity": "low",
+        "title": "Potential performance impact",
+        "description": "The new toml library may have a different performance profile than the old toml library.",
+        "severity": "medium",
         "status": "unverified"
       }
     ]

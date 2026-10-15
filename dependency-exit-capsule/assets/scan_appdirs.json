@@ -1,0 +1,52 @@
+{
+  "target_repo": "D:\\mlh\\LinkWatch",
+  "scan_timestamp": "2026-10-15T10:35:03.638308+00:00",
+  "total_dependencies": 1,
+  "dependencies": [
+    {
+      "package_name": "appdirs",
+      "canonical_name": "appdirs",
+      "declared_specifier": "==1.4.4",
+      "source_file": "requirements.txt",
+      "pypi_verified": true,
+      "latest_version": "1.4.4",
+      "pypi_url": "https://pypi.org/project/appdirs/",
+      "last_release_date": "2020-05-11T07:59:51.037820+00:00",
+      "days_since_last_release": 2348,
+      "yanked": false,
+      "yanked_reason": null,
+      "repository_url": "https://github.com/ActiveState/appdirs",
+      "github_archived": null,
+      "github_last_push": null,
+      "days_since_last_push": null,
+      "deprecation_signals": [],
+      "risk_status": "verified",
+      "indicator_metadata": {
+        "staleness_statement": "Staleness is an empirical indicator of inactivity, not proof of project abandonment.",
+        "indicators": {
+          "yanked": {
+            "source_url": "https://pypi.org/pypi/appdirs/json",
+            "fetched_at": "2026-10-15T10:35:00.379966+00:00",
+            "raw_value": false,
+            "reason": null
+          },
+          "last_release": {
+            "source_url": "https://pypi.org/pypi/appdirs/json",
+            "fetched_at": "2026-10-15T10:35:00.379966+00:00",
+            "raw_value": "2020-05-11T07:59:51.037820+00:00",
+            "days_elapsed": 2348
+          },
+          "github_status": {
+            "source_url": "https://api.github.com/repos/ActiveState/appdirs",
+            "fetched_at": "2026-10-15T10:35:00.379966+00:00",
+            "raw_value": "unavailable",
+            "error": "HTTP 403: rate limit exceeded"
+          }
+        }
+      },
+      "notes": [
+        "GitHub API: HTTP 403: rate limit exceeded"
+      ]
+    }
+  ]
+}

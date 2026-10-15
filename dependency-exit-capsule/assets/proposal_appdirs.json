@@ -1,58 +1,57 @@
 {
-  "model_metadata": {
-    "name": "gemma-2-9b-reference",
-    "version": "9b",
-    "access_method": "reference_expert",
-    "license": "Gemma Terms of Use"
+  "provenance": {
+    "provider": "ollama",
+    "model_id": "llama3.2:3b",
+    "model_license_name": "Llama 3.2 Community License Agreement",
+    "model_card_url": "https://github.com/meta-llama/llama-models",
+    "prompt_sha256": "b8ee3e73864d470b297067049a2135def3616b57395ecd171421a393971db752",
+    "raw_response_path": "in_memory",
+    "validation": {
+      "passed": true,
+      "rejected_candidates": []
+    }
   },
   "proposed_replacement": {
-    "package_name": "platformdirs",
-    "type": "pypi",
-    "version_specifier": ">=3.0.0",
-    "rationale": "platformdirs is the actively maintained, direct community successor to appdirs with exact API parity for user_cache_dir.",
+    "package_name": "pathlib",
+    "type": "stdlib",
+    "version_specifier": null,
+    "rationale": "",
     "validation": {
       "status": "verified",
       "is_valid": true,
-      "validation_source": "pypi",
-      "details": "Package 'platformdirs' verified on PyPI (latest version: 4.13.0)."
+      "validation_source": "sys.stdlib_module_names",
+      "details": "Module 'pathlib' is verified in the Python 3.14 standard library catalog."
     }
   },
   "migration_steps": [
     {
       "step_number": 1,
-      "title": "Replace appdirs import with platformdirs",
-      "description": "Change 'from appdirs import user_cache_dir' to 'from platformdirs import user_cache_dir' in linkwatch/cache.py.",
-      "diff_snippet": "-from appdirs import user_cache_dir\n+from platformdirs import user_cache_dir",
-      "status": "unverified"
-    },
-    {
-      "step_number": 2,
-      "title": "Update requirements files",
-      "description": "Replace appdirs==1.4.4 with platformdirs>=3.0.0 in requirements.txt and pyproject.toml.",
-      "diff_snippet": "-appdirs==1.4.4\n+platformdirs>=3.0.0",
+      "title": "Replace `appdirs` with `pathlib` in `cache.py`",
+      "description": "Replace all occurrences of `appdirs.user_cache_dir` with `pathlib.user_cache_dir`.",
+      "diff_snippet": "-import appdirs\n+import pathlib\n-    cache_dir = appdirs.user_cache_dir('linkwatch')\n+    cache_dir = pathlib.user_cache_dir('linkwatch')",
       "status": "unverified"
     }
   ],
   "suggested_tests": [
     {
-      "test_name": "test_cache_dir_platformdirs",
-      "description": "Ensure cache_dir returns a valid directory path created by platformdirs.",
-      "code_snippet": "def test_cache_dir_platformdirs():\n    from linkwatch.cache import cache_dir\n    path = cache_dir()\n    assert os.path.exists(path)\n    assert 'linkwatch' in path\n",
+      "test_name": "test_cache_dir",
+      "description": "Verify that `pathlib.user_cache_dir` returns the correct cache directory.",
+      "code_snippet": "import pathlib\ndef test_cache_dir():\n    cache_dir = pathlib.user_cache_dir('linkwatch')\n    assert cache_dir != '/tmp', 'Cache directory not correctly generated'",
       "status": "unverified"
     }
   ],
   "compatibility_gaps": [
     {
-      "area": "macOS Cache Paths",
-      "description": "platformdirs defaults to ~/Library/Caches/<appname> on macOS matching modern Apple HIG, whereas older appdirs had minor path variations.",
-      "mitigation": "Test and verify cache migration if persisting cache across upgrades.",
+      "area": "Behavior",
+      "description": "The `appdirs` package uses a more complex caching mechanism than `pathlib`.",
+      "mitigation": "The `pathlib` package may not provide the same level of caching reliability as `appdirs`. Additional testing may be necessary to ensure caching works correctly.",
       "status": "unverified"
     }
   ],
   "open_concerns_and_limitations": [
     {
-      "title": "Cache Directory Migration",
-      "description": "Existing user cache directories might need to be discovered if legacy cache persistence is critical.",
+      "title": "No known limitations or concerns",
+      "description": "",
       "severity": "low",
       "status": "unverified"
     }

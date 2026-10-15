@@ -1,16 +1,64 @@
 {
   "status": "verified",
+  "evidence": [
+    {
+      "path": "capsule-linkwatch-toml-20261015/pytest_baseline.txt",
+      "sha256": "f3939fc893e55cb0ff2ed2ff5e246377ab07acd3a9280983f8b7ac3e0ecdab1e",
+      "command": "python -m pytest --junitxml=baseline_junit.xml",
+      "exit_code": 1,
+      "captured_at": "2026-10-15T10:41:34.928948+00:00"
+    },
+    {
+      "path": "capsule-linkwatch-toml-20261015/baseline_junit.xml",
+      "sha256": "5d0c36733b745b12c2ff05cbb2cd573503fc7ba90677f894680c44b702c9adb3",
+      "command": "python -m pytest --junitxml=baseline_junit.xml",
+      "exit_code": 1,
+      "captured_at": "2026-10-15T10:41:34.928948+00:00"
+    },
+    {
+      "path": "capsule-linkwatch-toml-20261015/pytest_replacement.txt",
+      "sha256": "943da647d4890fed5806b842a3e87f2d505148b43870dfe2070e0c3f91304f2e",
+      "command": "python -m pytest --junitxml=replacement_junit.xml",
+      "exit_code": 1,
+      "captured_at": "2026-10-15T10:41:57.070699+00:00"
+    },
+    {
+      "path": "capsule-linkwatch-toml-20261015/replacement_junit.xml",
+      "sha256": "c334f365bf11bde16226237a3a4d8248bf1e04d0522d4498a08659f5d8799d20",
+      "command": "python -m pytest --junitxml=replacement_junit.xml",
+      "exit_code": 1,
+      "captured_at": "2026-10-15T10:41:57.070699+00:00"
+    },
+    {
+      "path": "capsule-linkwatch-toml-20261015/pip_check_baseline.txt",
+      "sha256": "87a3ba1741f948d5592c4ac852b2d9fb82a1309a2129bb8186e83a3b6c30e423",
+      "command": "python -m pip check (venv_A)",
+      "exit_code": 1,
+      "captured_at": "2026-10-15T10:41:34.928948+00:00"
+    },
+    {
+      "path": "capsule-linkwatch-toml-20261015/pip_check_replacement.txt",
+      "sha256": "f8a5d97fcdc3141d628e3f898a0b56e86ddb67a5a5df3c4c06c5617a9763ee23",
+      "command": "python -m pip check (venv_B)",
+      "exit_code": 1,
+      "captured_at": "2026-10-15T10:41:57.070699+00:00"
+    }
+  ],
   "baseline": {
     "total": 10,
     "passed": 9,
     "failed": 1,
     "errors": 0,
     "skipped": 0,
-    "duration_seconds": 9.325,
+    "duration_seconds": 9.272,
     "failures": [
       "tests.test_report::test_report_renders_all_sites"
     ],
-    "exit_code": 1
+    "exit_code": 1,
+    "pip_check": {
+      "exit_code": 1,
+      "output": "C:\\Users\\pradn\\AppData\\Local\\Temp\\dep_capsule_diff_6dc01k8s\\venv_A\\Scripts\\python.exe: No module named pip"
+    }
   },
   "replacement": {
     "total": 10,
@@ -18,11 +66,15 @@
     "failed": 1,
     "errors": 0,
     "skipped": 0,
-    "duration_seconds": 9.23,
+    "duration_seconds": 9.275,
     "failures": [
       "tests.test_report::test_report_renders_all_sites"
     ],
-    "exit_code": 1
+    "exit_code": 1,
+    "pip_check": {
+      "exit_code": 1,
+      "output": "C:\\Users\\pradn\\AppData\\Local\\Temp\\dep_capsule_diff_6dc01k8s\\venv_B\\Scripts\\python.exe: No module named pip"
+    }
   },
   "diff": {
     "status": "verified",

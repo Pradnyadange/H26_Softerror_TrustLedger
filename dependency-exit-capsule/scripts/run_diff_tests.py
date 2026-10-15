@@ -7,10 +7,14 @@ Strict execution isolation:
 2. Creates venv A (original baseline dependencies) and venv B (replacement + patch).
 3. Executes pytest with --junitxml in both environments sequentially (baseline first).
 4. Compares per-test results and reports ONLY new failures as attributable to the replacement.
+5. Runs `pip check` in each environment and captures stdout, stderr, and exit codes.
+6. Saves raw pytest output and junit XML under assets/evidence/<capsule_id>/.
 Outputs empirical JSON adhering to capsule-schema.json.
 """
 
 import argparse
+import datetime
+import hashlib
 import json
 import os
 import shutil
@@ -39,9 +43,17 @@ def run_command(cmd: list[str], cwd: Path | None = None, timeout: int = 180) -> 
         return -1, "", str(e)
 
 
+def sha256_file(filepath: Path) -> str:
+    """Compute sha256 hex digest of a file."""
+    h = hashlib.sha256()
+    with open(filepath, "rb") as f:
+        while chunk := f.read(65536):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def create_virtualenv(venv_path: Path, python_exe: str = sys.executable) -> Path:
     """Create a virtual environment using uv (if available) or python -m venv."""
-    # Check if uv is available for instant venv creation
     uv_available = shutil.which("uv") is not None
     if uv_available:
         code, stdout, stderr = run_command(["uv", "venv", "--python", "3.12", str(venv_path)])
@@ -50,7 +62,6 @@ def create_virtualenv(venv_path: Path, python_exe: str = sys.executable) -> Path
                 return venv_path / "Scripts" / "python.exe"
             return venv_path / "bin" / "python"
 
-    # Fallback to standard library venv
     code, stdout, stderr = run_command([python_exe, "-m", "venv", str(venv_path)])
     if code != 0:
         raise RuntimeError(f"Failed to create virtual environment at {venv_path}: {stderr}")
@@ -68,7 +79,6 @@ def install_deps(venv_python: Path, repo_path: Path, extra_packages: list[str] |
     cmd_prefix = ["uv", "pip", "install", "--link-mode=copy", "-p", str(venv_dir)] if uv_available else [str(venv_python), "-m", "pip", "install"]
 
     req_args = []
-    # Collect requirements files
     for rfile in sorted(repo_path.glob("requirements*.txt")):
         req_args.extend(["-r", str(rfile)])
 
@@ -98,8 +108,6 @@ def parse_junit_xml(xml_path: Path) -> dict:
 
     tree = ET.parse(xml_path)
     root = tree.getroot()
-
-    # Could be <testsuite> or <testsuites>
     suites = [root] if root.tag == "testsuite" else root.findall("testsuite")
 
     total = 0
@@ -157,90 +165,21 @@ def parse_junit_xml(xml_path: Path) -> dict:
     }
 
 
-def apply_replacement_patch(repo_b: Path, dep_name: str, replacement_name: str, patch_file: Path | None = None):
-    """Apply replacement code modifications to repo_B."""
-    dep_lower = dep_name.lower()
-    rep_lower = replacement_name.lower()
-
-    if patch_file and patch_file.exists():
-        patch_text = patch_file.read_text(encoding="utf-8")
-        # Try git apply if available
-        code, out, err = run_command(["git", "apply", str(patch_file)], cwd=repo_b)
+def apply_patch_file(repo_b: Path, patch_file: Path | None):
+    """Apply a unified diff patch to the target repository copy."""
+    if not patch_file or not patch_file.exists():
+        return False
+    # Attempt git apply
+    code, out, err = run_command(["git", "apply", "--ignore-whitespace", str(patch_file)], cwd=repo_b)
+    if code == 0:
+        return True
+    # Attempt patch tool if available
+    if shutil.which("patch"):
+        code, out, err = run_command(["patch", "-p1", "-i", str(patch_file)], cwd=repo_b)
         if code == 0:
-            return
-
-    # Built-in canonical patch templates for target migrations
-    if dep_lower == "toml" and rep_lower == "tomllib":
-        # Patch linkwatch/config.py
-        cfg_file = repo_b / "linkwatch" / "config.py"
-        if cfg_file.exists():
-            content = cfg_file.read_text(encoding="utf-8")
-            content = content.replace("import toml", "import tomllib")
-            content = content.replace(
-                "    data = toml.load(path)",
-                "    with open(path, \"rb\") as f:\n        data = tomllib.load(f)"
-            )
-            cfg_file.write_text(content, encoding="utf-8")
-
-        # Remove toml from requirements.txt
-        req_file = repo_b / "requirements.txt"
-        if req_file.exists():
-            lines = req_file.read_text(encoding="utf-8").splitlines()
-            clean_lines = [l for l in lines if not l.startswith("toml==") and not l.startswith("toml>=")]
-            req_file.write_text("\n".join(clean_lines) + "\n", encoding="utf-8")
-
-        # Remove toml from pyproject.toml
-        pyproj = repo_b / "pyproject.toml"
-        if pyproj.exists():
-            content = pyproj.read_text(encoding="utf-8")
-            content = content.replace('"toml==0.10.2",\n', "")
-            pyproj.write_text(content, encoding="utf-8")
-
-    elif dep_lower == "appdirs" and rep_lower == "platformdirs":
-        # Patch linkwatch/cache.py
-        cache_file = repo_b / "linkwatch" / "cache.py"
-        if cache_file.exists():
-            content = cache_file.read_text(encoding="utf-8")
-            content = content.replace("from appdirs import user_cache_dir", "from platformdirs import user_cache_dir")
-            cache_file.write_text(content, encoding="utf-8")
-
-        # Update requirements.txt
-        req_file = repo_b / "requirements.txt"
-        if req_file.exists():
-            content = req_file.read_text(encoding="utf-8")
-            content = content.replace("appdirs==1.4.4", "platformdirs>=3.0.0")
-            req_file.write_text(content, encoding="utf-8")
-
-        # Update pyproject.toml
-        pyproj = repo_b / "pyproject.toml"
-        if pyproj.exists():
-            content = pyproj.read_text(encoding="utf-8")
-            content = content.replace('"appdirs==1.4.4"', '"platformdirs>=3.0.0"')
-            pyproj.write_text(content, encoding="utf-8")
-
-    elif dep_lower in ("jinja2", "jinja"):
-        req_file = repo_b / "requirements.txt"
-        if req_file.exists():
-            content = req_file.read_text(encoding="utf-8")
-            if "markupsafe" in rep_lower:
-                # Candidate A: constrain MarkupSafe
-                if "markupsafe" not in content.lower():
-                    content = content.strip() + f"\n{replacement_name}\n"
-            else:
-                # Candidate B: upgrade Jinja2
-                spec = replacement_name if (">=" in replacement_name or "==" in replacement_name) else f"{replacement_name}>=3.1.2"
-                content = content.replace("Jinja2==2.11.3", spec)
-            req_file.write_text(content, encoding="utf-8")
-
-        pyproj = repo_b / "pyproject.toml"
-        if pyproj.exists():
-            content = pyproj.read_text(encoding="utf-8")
-            if "markupsafe" in rep_lower:
-                content = content.replace('"Jinja2==2.11.3",', f'"Jinja2==2.11.3",\n    "{replacement_name}",')
-            else:
-                spec = replacement_name if (">=" in replacement_name or "==" in replacement_name) else f"{replacement_name}>=3.1.2"
-                content = content.replace('"Jinja2==2.11.3"', f'"{spec}"')
-            pyproj.write_text(content, encoding="utf-8")
+            return True
+    sys.stderr.write(f"[WARN] Failed to apply patch file cleanly: {err}\n")
+    return False
 
 
 def run_diff_tests(
@@ -249,12 +188,21 @@ def run_diff_tests(
     replacement_name: str,
     replacement_type: str = "stdlib",
     patch_file: Path | None = None,
+    capsule_id: str | None = None,
+    evidence_dir: Path | None = None,
     python_exe: str = sys.executable,
     keep_temp: bool = False
 ) -> dict:
     """Run baseline pytest in venv A and replacement pytest in venv B, computing true differential failures."""
     temp_dir = tempfile.mkdtemp(prefix="dep_capsule_diff_")
     temp_path = Path(temp_dir).resolve()
+
+    cid = capsule_id or f"capsule-{dep_name}-{int(time.time())}"
+    target_evidence_dir = (evidence_dir / cid) if evidence_dir else None
+    if target_evidence_dir:
+        target_evidence_dir.mkdir(parents=True, exist_ok=True)
+
+    evidence_records = []
 
     try:
         repo_a = temp_path / "repo_A"
@@ -271,21 +219,28 @@ def run_diff_tests(
         python_a = create_virtualenv(venv_a_path, python_exe=python_exe)
         install_deps(python_a, repo_a)
 
+        # Baseline pip check
+        code_pip_a, out_pip_a, err_pip_a = run_command([str(python_a), "-m", "pip", "check"], cwd=repo_a)
+        pip_a_str = out_pip_a + ("\n" + err_pip_a if err_pip_a else "")
+
         # Run Baseline pytest
         baseline_xml = temp_path / "baseline_junit.xml"
         cmd_a = [str(python_a), "-m", "pytest", f"--junitxml={baseline_xml}"]
         t0 = time.time()
         exit_code_a, stdout_a, stderr_a = run_command(cmd_a, cwd=repo_a)
         duration_a = time.time() - t0
+        now_a = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
         baseline_summary = parse_junit_xml(baseline_xml)
         baseline_summary["exit_code"] = exit_code_a
+        baseline_summary["pip_check"] = {"exit_code": code_pip_a, "output": pip_a_str.strip()}
         if baseline_summary["duration_seconds"] == 0.0:
             baseline_summary["duration_seconds"] = round(duration_a, 3)
 
         # 2. Setup Venv B (Replacement + Patch)
         python_b = create_virtualenv(venv_b_path, python_exe=python_exe)
-        apply_replacement_patch(repo_b, dep_name, replacement_name, patch_file=patch_file)
+        if patch_file:
+            apply_patch_file(repo_b, patch_file)
 
         extra_b = []
         if replacement_type == "pypi" and replacement_name not in ("tomllib",):
@@ -293,20 +248,89 @@ def run_diff_tests(
 
         install_deps(python_b, repo_b, extra_packages=extra_b)
 
+        # Replacement pip check
+        code_pip_b, out_pip_b, err_pip_b = run_command([str(python_b), "-m", "pip", "check"], cwd=repo_b)
+        pip_b_str = out_pip_b + ("\n" + err_pip_b if err_pip_b else "")
+
         # Run Replacement pytest
         replacement_xml = temp_path / "replacement_junit.xml"
         cmd_b = [str(python_b), "-m", "pytest", f"--junitxml={replacement_xml}"]
         t1 = time.time()
         exit_code_b, stdout_b, stderr_b = run_command(cmd_b, cwd=repo_b)
         duration_b = time.time() - t1
+        now_b = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
         replacement_summary = parse_junit_xml(replacement_xml)
         replacement_summary["exit_code"] = exit_code_b
+        replacement_summary["pip_check"] = {"exit_code": code_pip_b, "output": pip_b_str.strip()}
         if replacement_summary["duration_seconds"] == 0.0:
             replacement_summary["duration_seconds"] = round(duration_b, 3)
 
+        # Persist raw evidence artifacts if requested
+        if target_evidence_dir:
+            raw_base_out = target_evidence_dir / "pytest_baseline.txt"
+            raw_base_out.write_text(stdout_a + "\n" + stderr_a, encoding="utf-8")
+            evidence_records.append({
+                "path": f"{cid}/pytest_baseline.txt",
+                "sha256": sha256_file(raw_base_out),
+                "command": "python -m pytest --junitxml=baseline_junit.xml",
+                "exit_code": exit_code_a,
+                "captured_at": now_a
+            })
+
+            dest_base_xml = target_evidence_dir / "baseline_junit.xml"
+            if baseline_xml.exists():
+                shutil.copy2(baseline_xml, dest_base_xml)
+                evidence_records.append({
+                    "path": f"{cid}/baseline_junit.xml",
+                    "sha256": sha256_file(dest_base_xml),
+                    "command": "python -m pytest --junitxml=baseline_junit.xml",
+                    "exit_code": exit_code_a,
+                    "captured_at": now_a
+                })
+
+            raw_rep_out = target_evidence_dir / "pytest_replacement.txt"
+            raw_rep_out.write_text(stdout_b + "\n" + stderr_b, encoding="utf-8")
+            evidence_records.append({
+                "path": f"{cid}/pytest_replacement.txt",
+                "sha256": sha256_file(raw_rep_out),
+                "command": "python -m pytest --junitxml=replacement_junit.xml",
+                "exit_code": exit_code_b,
+                "captured_at": now_b
+            })
+
+            dest_rep_xml = target_evidence_dir / "replacement_junit.xml"
+            if replacement_xml.exists():
+                shutil.copy2(replacement_xml, dest_rep_xml)
+                evidence_records.append({
+                    "path": f"{cid}/replacement_junit.xml",
+                    "sha256": sha256_file(dest_rep_xml),
+                    "command": "python -m pytest --junitxml=replacement_junit.xml",
+                    "exit_code": exit_code_b,
+                    "captured_at": now_b
+                })
+
+            pip_a_file = target_evidence_dir / "pip_check_baseline.txt"
+            pip_a_file.write_text(pip_a_str, encoding="utf-8")
+            evidence_records.append({
+                "path": f"{cid}/pip_check_baseline.txt",
+                "sha256": sha256_file(pip_a_file),
+                "command": "python -m pip check (venv_A)",
+                "exit_code": code_pip_a,
+                "captured_at": now_a
+            })
+
+            pip_b_file = target_evidence_dir / "pip_check_replacement.txt"
+            pip_b_file.write_text(pip_b_str, encoding="utf-8")
+            evidence_records.append({
+                "path": f"{cid}/pip_check_replacement.txt",
+                "sha256": sha256_file(pip_b_file),
+                "command": "python -m pip check (venv_B)",
+                "exit_code": code_pip_b,
+                "captured_at": now_b
+            })
+
         # 3. Differential Result Comparison
-        # Attributable new failures = tests that passed in baseline, but failed/errored in replacement
         base_cases = baseline_summary.get("test_cases", {})
         rep_cases = replacement_summary.get("test_cases", {})
 
@@ -316,15 +340,12 @@ def run_diff_tests(
         for tid, r_info in rep_cases.items():
             b_info = base_cases.get(tid)
             if r_info["status"] in ("failed", "error"):
-                # If it passed in baseline, this is a regression attributable to replacement!
                 if b_info and b_info["status"] == "passed":
                     new_failures.append(tid)
             elif r_info["status"] == "passed":
-                # If it failed in baseline, replacement resolved it!
                 if b_info and b_info["status"] in ("failed", "error"):
                     resolved_failures.append(tid)
 
-        # Remove internal test_cases dictionary for clean schema adherence
         baseline_summary.pop("test_cases", None)
         replacement_summary.pop("test_cases", None)
 
@@ -335,6 +356,7 @@ def run_diff_tests(
 
         return {
             "status": "verified",
+            "evidence": evidence_records,
             "baseline": baseline_summary,
             "replacement": replacement_summary,
             "diff": {
@@ -382,6 +404,16 @@ def main():
         help="Optional path to unified diff patch file"
     )
     parser.add_argument(
+        "--capsule-id",
+        default=None,
+        help="Capsule ID for organizing evidence directory"
+    )
+    parser.add_argument(
+        "--evidence-dir",
+        default=None,
+        help="Directory to save raw pytest output, junit XML, and pip check evidence"
+    )
+    parser.add_argument(
         "--python-exe",
         default=sys.executable,
         help="Python executable to use for venv creation"
@@ -400,6 +432,7 @@ def main():
     args = parser.parse_args()
     repo_dir = Path(args.repo_path).resolve()
     patch_path = Path(args.patch_file).resolve() if args.patch_file else None
+    ev_dir = Path(args.evidence_dir).resolve() if args.evidence_dir else None
 
     result = run_diff_tests(
         repo_path=repo_dir,
@@ -407,6 +440,8 @@ def main():
         replacement_name=args.replacement,
         replacement_type=args.type,
         patch_file=patch_path,
+        capsule_id=args.capsule_id,
+        evidence_dir=ev_dir,
         python_exe=args.python_exe,
         keep_temp=args.keep_temp
     )

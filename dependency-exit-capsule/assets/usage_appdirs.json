@@ -9,6 +9,7 @@
       {
         "file": "linkwatch/cache.py",
         "line": 4,
+        "target_dependency": "appdirs",
         "imported_symbol": "appdirs.user_cache_dir",
         "alias": null,
         "is_dynamic": false,
@@ -19,6 +20,7 @@
       {
         "file": "linkwatch/cache.py",
         "line": 10,
+        "target_dependency": "appdirs",
         "call_expression": "user_cache_dir('linkwatch')",
         "resolved_symbol": "appdirs.user_cache_dir",
         "status": "verified"

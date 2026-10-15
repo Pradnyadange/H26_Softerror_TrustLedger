@@ -1,0 +1,52 @@
+{
+  "target_repo": "D:\\mlh\\LinkWatch",
+  "scan_timestamp": "2026-10-15T10:34:35.126507+00:00",
+  "total_dependencies": 1,
+  "dependencies": [
+    {
+      "package_name": "toml",
+      "canonical_name": "toml",
+      "declared_specifier": "==0.10.2",
+      "source_file": "requirements.txt",
+      "pypi_verified": true,
+      "latest_version": "0.10.2",
+      "pypi_url": "https://pypi.org/project/toml/",
+      "last_release_date": "2020-11-01T01:40:22.204866+00:00",
+      "days_since_last_release": 2174,
+      "yanked": false,
+      "yanked_reason": null,
+      "repository_url": "https://github.com/uiri/toml",
+      "github_archived": null,
+      "github_last_push": null,
+      "days_since_last_push": null,
+      "deprecation_signals": [],
+      "risk_status": "verified",
+      "indicator_metadata": {
+        "staleness_statement": "Staleness is an empirical indicator of inactivity, not proof of project abandonment.",
+        "indicators": {
+          "yanked": {
+            "source_url": "https://pypi.org/pypi/toml/json",
+            "fetched_at": "2026-10-15T10:34:31.965540+00:00",
+            "raw_value": false,
+            "reason": null
+          },
+          "last_release": {
+            "source_url": "https://pypi.org/pypi/toml/json",
+            "fetched_at": "2026-10-15T10:34:31.965540+00:00",
+            "raw_value": "2020-11-01T01:40:22.204866+00:00",
+            "days_elapsed": 2174
+          },
+          "github_status": {
+            "source_url": "https://api.github.com/repos/uiri/toml",
+            "fetched_at": "2026-10-15T10:34:31.965540+00:00",
+            "raw_value": "unavailable",
+            "error": "HTTP 403: rate limit exceeded"
+          }
+        }
+      },
+      "notes": [
+        "GitHub API: HTTP 403: rate limit exceeded"
+      ]
+    }
+  ]
+}

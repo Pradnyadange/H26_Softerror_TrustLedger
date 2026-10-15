@@ -1,0 +1,83 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: C:\Users\pradn\AppData\Local\Temp\dep_capsule_diff_bnusy3o0\repo_B
+configfile: pyproject.toml
+testpaths: tests
+plugins: platformdirs-4.13.0
+collected 10 items
+
+tests\test_cache.py .                                                    [ 10%]
+tests\test_checker.py .......                                            [ 80%]
+tests\test_config.py .                                                   [ 90%]
+tests\test_report.py F                                                   [100%]
+
+================================== FAILURES ===================================
+________________________ test_report_renders_all_sites ________________________
+
+tmp_path = WindowsPath('C:/Users/pradn/AppData/Local/Temp/pytest-of-pradn/pytest-27/test_report_renders_all_sites0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002749CEFCF20>
+
+    def test_report_renders_all_sites(tmp_path, monkeypatch):
+        monkeypatch.setenv("LINKWATCH_CACHE_DIR", str(tmp_path))
+        cache.save_results(RESULTS)
+        output = tmp_path / "status.html"
+>       result = CliRunner().invoke(cli, ["report", "-o", str(output)], catch_exceptions=False)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_report.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\venv_B\Lib\site-packages\click\testing.py:687: in invoke
+    return_value = cli.main(args=args or (), prog_name=prog_name, **extra)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\venv_B\Lib\site-packages\click\core.py:1552: in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+..\venv_B\Lib\site-packages\click\core.py:2032: in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\venv_B\Lib\site-packages\click\core.py:1415: in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\venv_B\Lib\site-packages\click\core.py:910: in invoke
+    return callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+linkwatch\cli.py:56: in report
+    from .report import render_report
+linkwatch\report.py:3: in <module>
+    from jinja2 import Environment, FileSystemLoader, select_autoescape
+..\venv_B\Lib\site-packages\jinja2\__init__.py:12: in <module>
+    from .environment import Environment
+..\venv_B\Lib\site-packages\jinja2\environment.py:25: in <module>
+    from .defaults import BLOCK_END_STRING
+..\venv_B\Lib\site-packages\jinja2\defaults.py:3: in <module>
+    from .filters import FILTERS as DEFAULT_FILTERS  # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    # -*- coding: utf-8 -*-
+    """Built-in template filters used with the ``|`` operator."""
+    import math
+    import random
+    import re
+    import warnings
+    from collections import namedtuple
+    from itertools import chain
+    from itertools import groupby
+    
+    from markupsafe import escape
+    from markupsafe import Markup
+>   from markupsafe import soft_unicode
+E   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (C:\Users\pradn\AppData\Local\Temp\dep_capsule_diff_bnusy3o0\venv_B\Lib\site-packages\markupsafe\__init__.py)
+
+..\venv_B\Lib\site-packages\jinja2\filters.py:13: ImportError
+============================== warnings summary ===============================
+linkwatch\resources.py:1
+  C:\Users\pradn\AppData\Local\Temp\dep_capsule_diff_bnusy3o0\repo_B\linkwatch\resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+    import pkg_resources
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\pradn\AppData\Local\Temp\dep_capsule_diff_bnusy3o0\replacement_junit.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_report.py::test_report_renders_all_sites - ImportError: can...
+=================== 1 failed, 9 passed, 1 warning in 9.32s ====================
+

@@ -1,0 +1,127 @@
+{
+  "description": "Rule-based known migrations reference dataset for offline fallback and test verification. Not executable code.",
+  "migrations": {
+    "toml": {
+      "proposed_replacement": {
+        "package_name": "tomllib",
+        "type": "stdlib",
+        "version_specifier": null,
+        "rationale": "Python 3.11+ includes tomllib in standard library (PEP 680), eliminating third-party unmaintained TOML dependencies."
+      },
+      "migration_steps": [
+        {
+          "step_number": 1,
+          "title": "Replace import with tomllib",
+          "description": "Change 'import toml' to 'import tomllib' in config parser files.",
+          "diff_snippet": "-import toml\n+import tomllib"
+        },
+        {
+          "step_number": 2,
+          "title": "Use binary file handle for load()",
+          "description": "tomllib.load requires a binary read mode file descriptor ('rb') rather than taking string paths.",
+          "diff_snippet": "-    data = toml.load(path)\n+    with open(path, 'rb') as f:\n+        data = tomllib.load(f)"
+        },
+        {
+          "step_number": 3,
+          "title": "Remove toml from requirements and pyproject",
+          "description": "Remove toml specification from requirements.txt and pyproject.toml.",
+          "diff_snippet": "-toml==0.10.2"
+        }
+      ],
+      "suggested_tests": [
+        {
+          "test_name": "test_load_settings_tomllib",
+          "description": "Verify config loader parses settings using tomllib without error.",
+          "code_snippet": "def test_load_settings_tomllib(tmp_path):\n    # verified test code\n    pass\n"
+        }
+      ],
+      "compatibility_gaps": [
+        {
+          "area": "File Mode",
+          "description": "toml.load accepted string paths or text mode; tomllib strictly requires binary mode ('rb').",
+          "mitigation": "Wrap with 'with open(path, \"rb\") as f: tomllib.load(f)'."
+        },
+        {
+          "area": "Write Support",
+          "description": "tomllib is read-only and does not implement dump().",
+          "mitigation": "Codebase only performs read/load operations."
+        }
+      ],
+      "open_concerns_and_limitations": [
+        {
+          "title": "Minimum Python Version",
+          "description": "tomllib requires Python >= 3.11. For 3.10 support, tomli must be used conditionally.",
+          "severity": "low"
+        }
+      ]
+    },
+    "appdirs": {
+      "proposed_replacement": {
+        "package_name": "platformdirs",
+        "type": "pypi",
+        "version_specifier": ">=3.0.0",
+        "rationale": "platformdirs is the actively maintained, direct community successor to appdirs with exact API parity for user directories."
+      },
+      "migration_steps": [
+        {
+          "step_number": 1,
+          "title": "Replace appdirs import with platformdirs",
+          "description": "Change 'from appdirs import ...' to 'from platformdirs import ...'.",
+          "diff_snippet": "-from appdirs import user_cache_dir\n+from platformdirs import user_cache_dir"
+        },
+        {
+          "step_number": 2,
+          "title": "Update requirements",
+          "description": "Replace appdirs with platformdirs in requirements files.",
+          "diff_snippet": "-appdirs==1.4.4\n+platformdirs>=3.0.0"
+        }
+      ],
+      "suggested_tests": [
+        {
+          "test_name": "test_platformdirs_paths",
+          "description": "Verify user directory resolution returns existing valid directory path.",
+          "code_snippet": "def test_platformdirs_paths():\n    pass\n"
+        }
+      ],
+      "compatibility_gaps": [
+        {
+          "area": "macOS Path Differences",
+          "description": "platformdirs uses modern Apple HIG paths on macOS.",
+          "mitigation": "Paths are standardized on modern OS defaults."
+        }
+      ],
+      "open_concerns_and_limitations": []
+    },
+    "jinja2": {
+      "proposed_replacement": {
+        "package_name": "Jinja2",
+        "type": "pypi",
+        "version_specifier": ">=3.1.2",
+        "rationale": "Jinja2 3.1.x restores compatibility with modern MarkupSafe (>=2.0, 3.x), eliminates the removed soft_unicode import, and supports Python 3.12."
+      },
+      "migration_steps": [
+        {
+          "step_number": 1,
+          "title": "Update Jinja2 constraint in requirements.txt",
+          "description": "Update pinned Jinja2 to >=3.1.2 to resolve soft_unicode incompatibility with MarkupSafe 3.x.",
+          "diff_snippet": "-Jinja2==2.11.3\n+Jinja2>=3.1.2"
+        }
+      ],
+      "suggested_tests": [
+        {
+          "test_name": "test_jinja2_template_rendering",
+          "description": "Ensure HTML templates render correctly without soft_unicode ImportError.",
+          "code_snippet": "def test_jinja2_template_rendering():\n    from jinja2 import Environment\n    env = Environment()\n    t = env.from_string('Hello {{ name }}')\n    assert t.render(name='World') == 'Hello World'\n"
+        }
+      ],
+      "compatibility_gaps": [
+        {
+          "area": "MarkupSafe soft_unicode",
+          "description": "MarkupSafe 2.1.0+ removed soft_unicode; Jinja2 >=3.1.2 uses standard str.",
+          "mitigation": "Upgrading Jinja2 resolves the incompatibility."
+        }
+      ],
+      "open_concerns_and_limitations": []
+    }
+  }
+}

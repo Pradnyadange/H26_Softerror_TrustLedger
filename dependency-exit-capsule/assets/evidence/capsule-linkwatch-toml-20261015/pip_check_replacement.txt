@@ -1,0 +1,2 @@
+
+C:\Users\pradn\AppData\Local\Temp\dep_capsule_diff_6dc01k8s\venv_B\Scripts\python.exe: No module named pip

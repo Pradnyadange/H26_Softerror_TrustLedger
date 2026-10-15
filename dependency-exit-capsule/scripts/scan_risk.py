@@ -203,9 +203,10 @@ def query_github_repo(owner: str, repo: str, token: str | None = None, timeout: 
 def scan_dependency_risk(dep: dict, github_token: str | None = None, timeout: int = 10) -> dict:
     """Gather factual risk indicators for a single dependency without subjective opinions."""
     pkg_name = dep["name"]
+    pypi_url_endpoint = f"https://pypi.org/pypi/{urllib.parse.quote(pkg_name)}/json"
     pypi_result = query_pypi(pkg_name, timeout=timeout)
-
     now = datetime.datetime.now(datetime.timezone.utc)
+    fetch_ts = now.isoformat()
 
     result = {
         "package_name": pkg_name,
@@ -225,12 +226,23 @@ def scan_dependency_risk(dep: dict, github_token: str | None = None, timeout: in
         "days_since_last_push": None,
         "deprecation_signals": [],
         "risk_status": "unverified",
+        "indicator_metadata": {
+            "staleness_statement": "Staleness is an empirical indicator of inactivity, not proof of project abandonment.",
+            "indicators": {}
+        },
         "notes": []
     }
 
     if not pypi_result["success"]:
         result["risk_status"] = "not_testable"
         result["notes"].append(f"PyPI API error: {pypi_result['error']}")
+        result["indicator_metadata"]["indicators"]["pypi_status"] = {
+            "source_url": pypi_url_endpoint,
+            "fetched_at": fetch_ts,
+            "raw_value": "unavailable",
+            "status": "unavailable",
+            "error": pypi_result["error"]
+        }
         return result
 
     pypi_data = pypi_result["data"]
@@ -239,6 +251,14 @@ def scan_dependency_risk(dep: dict, github_token: str | None = None, timeout: in
     result["latest_version"] = info.get("version")
     result["yanked"] = bool(info.get("yanked", False))
     result["yanked_reason"] = info.get("yanked_reason")
+
+    # Record PyPI indicators with full provenance
+    result["indicator_metadata"]["indicators"]["yanked"] = {
+        "source_url": pypi_url_endpoint,
+        "fetched_at": fetch_ts,
+        "raw_value": result["yanked"],
+        "reason": result["yanked_reason"]
+    }
 
     # Find latest release date from releases dictionary
     releases = pypi_data.get("releases", {})
@@ -249,7 +269,6 @@ def scan_dependency_risk(dep: dict, github_token: str | None = None, timeout: in
             upload_str = f.get("upload_time_iso_8601")
             if upload_str:
                 try:
-                    # Parse ISO timestamp
                     clean_ts = upload_str.replace("Z", "+00:00")
                     dt = datetime.datetime.fromisoformat(clean_ts)
                     if latest_upload_dt is None or dt > latest_upload_dt:
@@ -260,6 +279,19 @@ def scan_dependency_risk(dep: dict, github_token: str | None = None, timeout: in
     if latest_upload_dt:
         result["last_release_date"] = latest_upload_dt.isoformat()
         result["days_since_last_release"] = (now - latest_upload_dt).days
+        result["indicator_metadata"]["indicators"]["last_release"] = {
+            "source_url": pypi_url_endpoint,
+            "fetched_at": fetch_ts,
+            "raw_value": result["last_release_date"],
+            "days_elapsed": result["days_since_last_release"]
+        }
+    else:
+        result["indicator_metadata"]["indicators"]["last_release"] = {
+            "source_url": pypi_url_endpoint,
+            "fetched_at": fetch_ts,
+            "raw_value": "unavailable",
+            "days_elapsed": None
+        }
 
     # Search for candidate repository URLs
     url_candidates = []
@@ -279,11 +311,9 @@ def scan_dependency_risk(dep: dict, github_token: str | None = None, timeout: in
     for pattern in DEPRECATION_PATTERNS:
         matches = pattern.finditer(description_text)
         for m in matches:
-            # Capture surrounding sentence context
             start = max(0, m.start() - 40)
             end = min(len(description_text), m.end() + 60)
             snippet = description_text[start:end].replace("\n", " ").strip()
-            # Normalize whitespace
             snippet = re.sub(r"\s+", " ", snippet)
             if snippet not in result["deprecation_signals"]:
                 result["deprecation_signals"].append(snippet)
@@ -294,6 +324,7 @@ def scan_dependency_risk(dep: dict, github_token: str | None = None, timeout: in
 
     # Query GitHub if repository coordinates found
     if owner and repo:
+        gh_endpoint = f"https://api.github.com/repos/{owner}/{repo}"
         gh_result = query_github_repo(owner, repo, token=github_token, timeout=timeout)
         if gh_result["success"]:
             gh_data = gh_result["data"]
@@ -307,12 +338,33 @@ def scan_dependency_risk(dep: dict, github_token: str | None = None, timeout: in
                 except Exception:
                     pass
             result["risk_status"] = "verified"
+            result["indicator_metadata"]["indicators"]["github_status"] = {
+                "source_url": gh_endpoint,
+                "fetched_at": fetch_ts,
+                "raw_value": {
+                    "archived": result["github_archived"],
+                    "pushed_at": result["github_last_push"],
+                    "days_since_last_push": result["days_since_last_push"]
+                }
+            }
         else:
-            result["notes"].append(f"GitHub API: {gh_result['error']}")
-            # PyPI succeeded, but GitHub had an issue (e.g. rate limit 403 or repo not found)
+            err_msg = gh_result["error"]
+            result["notes"].append(f"GitHub API: {err_msg}")
             result["risk_status"] = "verified"  # PyPI facts are verified
+            result["indicator_metadata"]["indicators"]["github_status"] = {
+                "source_url": gh_endpoint,
+                "fetched_at": fetch_ts,
+                "raw_value": "unavailable",
+                "error": err_msg
+            }
     else:
         result["risk_status"] = "verified"
+        result["indicator_metadata"]["indicators"]["github_status"] = {
+            "source_url": None,
+            "fetched_at": fetch_ts,
+            "raw_value": "unavailable",
+            "reason": "no_github_repository_url_declared"
+        }
 
     return result
 

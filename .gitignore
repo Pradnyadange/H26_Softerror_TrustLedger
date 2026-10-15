@@ -26,3 +26,8 @@ htmlcov/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Target inspection repos and scratch work
+LinkWatch/
+work/
+
