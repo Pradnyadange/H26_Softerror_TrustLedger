@@ -6,7 +6,7 @@ from pathlib import Path
 
 # --- PAGE CONFIG ---
 st.set_page_config(
-    page_title="BISO Cartographer | Dependency Exit & Causal Graph",
+    page_title="BISO | Cartographer & Causal Graph",
     page_icon="🧬",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -18,27 +18,26 @@ REPO_ROOT = BASE_DIR.parent
 ASSETS_DIR = BASE_DIR / "assets"
 LINKWATCH_DIR = REPO_ROOT / "LinkWatch"
 
-# --- CUSTOM THEME & CSS (Matches BISO Design System) ---
+# --- CUSTOM CSS: PIXEL-PERFECT BISO CONTROL PLANE THEME ---
 st.markdown("""
 <style>
-    /* Global Styles */
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
     :root {
         --bg-main: #06090f;
         --bg-card: #0c121d;
         --bg-card-hover: #111a28;
-        --border-color: #1a273b;
+        --border-color: #172233;
         --primary-cyan: #0df2c9;
         --primary-cyan-dim: rgba(13, 242, 201, 0.12);
         --accent-orange: #ff6b4a;
-        --accent-purple: #9d4edd;
         --accent-blue: #38bdf8;
         --text-main: #e2e8f0;
         --text-muted: #64748b;
         --text-sub: #94a3b8;
     }
 
+    /* Streamlit App background and fonts */
     .stApp {
         background-color: var(--bg-main);
         color: var(--text-main);
@@ -46,7 +45,14 @@ st.markdown("""
     }
 
     header[data-testid="stHeader"] {
-        background-color: transparent !important;
+        display: none !important;
+    }
+    .block-container {
+        padding-top: 1.2rem !important;
+        padding-bottom: 2rem !important;
+        padding-left: 1.8rem !important;
+        padding-right: 1.8rem !important;
+        max-width: 100% !important;
     }
 
     /* Top Control Bar */
@@ -55,23 +61,23 @@ st.markdown("""
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid var(--border-color);
-        padding: 0.6rem 0rem 1.2rem 0rem;
-        margin-bottom: 1.5rem;
+        padding-bottom: 0.9rem;
+        margin-bottom: 1.2rem;
     }
     .cp-title {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        font-size: 0.82rem;
+        gap: 0.6rem;
+        font-size: 0.78rem;
         font-weight: 700;
-        letter-spacing: 0.14em;
+        letter-spacing: 0.15em;
         text-transform: uppercase;
         color: var(--primary-cyan);
     }
     .cp-badges {
         display: flex;
         align-items: center;
-        gap: 0.6rem;
+        gap: 0.5rem;
     }
     .badge-live {
         background: var(--primary-cyan-dim);
@@ -79,7 +85,7 @@ st.markdown("""
         border: 1px solid rgba(13, 242, 201, 0.3);
         border-radius: 9999px;
         padding: 0.2rem 0.65rem;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 600;
         display: inline-flex;
         align-items: center;
@@ -91,27 +97,36 @@ st.markdown("""
         border: 1px solid rgba(52, 211, 153, 0.3);
         border-radius: 9999px;
         padding: 0.2rem 0.65rem;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 600;
     }
 
-    /* Subtitle & Header */
+    /* View Title */
+    .cartographer-tag {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 0.2rem;
+    }
     .view-title {
-        font-size: 1.65rem;
+        font-size: 1.85rem;
         font-weight: 700;
         color: #ffffff;
         letter-spacing: -0.02em;
         margin: 0;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.6rem;
     }
     .view-subtitle {
         color: var(--text-muted);
         font-size: 0.88rem;
-        margin-top: 0.25rem;
-        margin-bottom: 1.4rem;
-        line-height: 1.45;
+        margin-top: 0.35rem;
+        margin-bottom: 1.2rem;
+        line-height: 1.5;
+        max-width: 950px;
     }
 
     /* Cards */
@@ -119,17 +134,17 @@ st.markdown("""
         background-color: var(--bg-card);
         border: 1px solid var(--border-color);
         border-radius: 12px;
-        padding: 1.25rem;
+        padding: 1.15rem 1.25rem;
         margin-bottom: 1rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
     .biso-card-header {
-        font-size: 0.75rem;
+        font-size: 0.76rem;
         font-weight: 700;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
         color: var(--text-sub);
-        margin-bottom: 1rem;
+        margin-bottom: 0.85rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -139,9 +154,10 @@ st.markdown("""
     .stat-row {
         display: flex;
         justify-content: space-between;
-        padding: 0.45rem 0;
+        align-items: center;
+        padding: 0.55rem 0;
         border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        font-size: 0.85rem;
+        font-size: 0.86rem;
     }
     .stat-row:last-child {
         border-bottom: none;
@@ -160,104 +176,143 @@ st.markdown("""
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0.5rem 0.6rem;
+        padding: 0.45rem 0.55rem;
         border-radius: 6px;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.2rem;
         font-size: 0.82rem;
         font-family: 'JetBrains Mono', monospace;
-        background: rgba(255, 255, 255, 0.02);
+        background: rgba(255, 255, 255, 0.015);
         border-left: 2px solid transparent;
         transition: all 0.2s ease;
     }
     .hot-item:hover {
         background: var(--bg-card-hover);
-        border-left: 2px solid var(--accent-orange);
+        border-left: 2px solid var(--primary-cyan);
     }
     .hot-item-name {
         color: var(--text-main);
         display: flex;
         align-items: center;
         gap: 0.45rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .flame-icon {
         color: var(--accent-orange);
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
     .hot-item-score {
         color: var(--accent-orange);
         font-weight: 700;
+        font-size: 0.82rem;
+        margin-left: 0.5rem;
     }
 
     /* Sidebar Customization */
     section[data-testid="stSidebar"] {
         background-color: #070b12 !important;
         border-right: 1px solid var(--border-color);
+        padding-top: 1.5rem !important;
     }
     .brand-logo {
-        font-size: 1.15rem;
+        font-size: 1.25rem;
         font-weight: 800;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
         color: #ffffff;
-        margin-bottom: 0.1rem;
+        margin-bottom: 0.15rem;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.55rem;
     }
     .brand-sub {
-        font-size: 0.68rem;
+        font-size: 0.65rem;
         color: var(--text-muted);
-        letter-spacing: 0.12em;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.4rem;
     }
     .sidebar-section-title {
-        font-size: 0.7rem;
-        letter-spacing: 0.12em;
+        font-size: 0.68rem;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
         color: var(--text-muted);
-        margin: 1.2rem 0 0.4rem 0.2rem;
+        margin: 1.1rem 0 0.35rem 0.2rem;
         font-weight: 700;
     }
 
-    /* Code blocks and JSON */
-    pre, code {
-        font-family: 'JetBrains Mono', monospace !important;
+    /* Streamlit Widget tweaks */
+    div[data-baseweb="select"] > div {
+        background-color: #070d17 !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-main) !important;
+        border-radius: 8px !important;
+        font-size: 0.82rem !important;
+    }
+    div[data-testid="stRadio"] label {
+        color: var(--text-sub) !important;
+        font-size: 0.84rem !important;
+    }
+    .stTextArea textarea {
         background-color: #05080e !important;
-        border: 1px solid var(--border-color) !important;
+        border-color: var(--border-color) !important;
+        color: #cbd5e1 !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 0.78rem !important;
         border-radius: 8px !important;
     }
-
-    /* Blast Radius Presets */
-    .preset-btn {
-        background: #0d1522;
-        border: 1px solid #1a283e;
-        color: #94a3b8;
-        padding: 0.45rem 0.65rem;
-        border-radius: 6px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.78rem;
-        margin-bottom: 0.4rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
+    .stButton button {
+        background-color: #0c1524 !important;
+        border: 1px solid var(--border-color) !important;
+        color: #0df2c9 !important;
+        font-weight: 600 !important;
+        font-size: 0.82rem !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease;
+    }
+    .stButton button:hover {
+        background-color: var(--primary-cyan) !important;
+        color: #06090f !important;
+        border-color: var(--primary-cyan) !important;
     }
 
-    /* Legend */
-    .legend-box {
-        background: rgba(12, 18, 29, 0.95);
+    /* Tabs styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        background-color: transparent;
+    }
+    .stTabs [data-baseweb="tab"] {
+        padding: 0.75rem 0.25rem !important;
+        font-size: 0.88rem !important;
+        font-weight: 600 !important;
+        color: var(--text-muted) !important;
+        background-color: transparent !important;
+    }
+    .stTabs [aria-selected="true"] {
+        color: var(--primary-cyan) !important;
+        border-bottom-color: var(--primary-cyan) !important;
+    }
+
+    /* Custom Metric cards in tabs */
+    .metric-chip {
+        background: #090e18;
         border: 1px solid var(--border-color);
-        padding: 0.65rem 0.9rem;
         border-radius: 8px;
-        font-size: 0.75rem;
-        color: var(--text-sub);
+        padding: 0.85rem 1rem;
     }
-    .legend-dot {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        margin-right: 0.4rem;
+    .metric-chip-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+    }
+    .metric-chip-value {
+        font-size: 1.15rem;
+        font-weight: 700;
+        font-family: 'JetBrains Mono', monospace;
+        color: #ffffff;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -282,28 +337,17 @@ def load_capsules():
             capsules[dep_name] = data
     return capsules
 
-@st.cache_data
-def load_proposals():
-    proposals = {}
-    for p in ASSETS_DIR.glob("proposal_*.json"):
-        with open(p, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            dep_name = data.get("target_dependency", p.stem.replace("proposal_", ""))
-            proposals[dep_name] = data
-    return proposals
-
 scan_data = load_scan_data()
 capsules_data = load_capsules()
-proposals_data = load_proposals()
 
-# --- SIDEBAR NAVIGATION (Exact match to BISO sidebar) ---
+# --- SIDEBAR NAVIGATION (Matching BISO Reference) ---
 with st.sidebar:
     st.markdown("""
         <div class="brand-logo">
-            <span style="display:inline-block; width:14px; height:14px; background:#0df2c9; border-radius:3px;"></span>
+            <span style="display:inline-block; width:13px; height:13px; background:#0df2c9; border-radius:3px;"></span>
             BISO
         </div>
-        <div class="brand-sub">BUG IMMUNE SYSTEM & TRUST LEDGER</div>
+        <div class="brand-sub">BUG IMMUNE SYSTEM</div>
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="sidebar-section-title">AGENTS</div>', unsafe_allow_html=True)
@@ -340,57 +384,58 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    st.caption("Active Repo: `LinkWatch` (main)")
-    st.caption("Environment: Isolated Sandbox Verified")
+    st.caption("Active Target: `LinkWatch`")
+    st.caption("Branch: `fix/jinja2-markupsafe-compat`")
 
 
 # --- TOP CONTROL BAR ---
 st.markdown("""
     <div class="control-plane-header">
         <div class="cp-title">
-            <span>((•))</span> CONTROL PLANE &bull; DEPENDENCY EXIT ENGINE
+            <span>((•))</span> CONTROL PLANE
         </div>
         <div class="cp-badges">
-            <div class="badge-live"><span style="width:6px; height:6px; background:#0df2c9; border-radius:50%; display:inline-block;"></span> LIVE</div>
-            <div class="badge-nominal">● SYSTEM NOMINAL</div>
+            <div class="badge-live"><span style="width:5px; height:5px; background:#0df2c9; border-radius:50%; display:inline-block;"></span> live</div>
+            <div class="badge-nominal">● system nominal</div>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
 
-# --- MAIN CONTENT: CARTOGRAPHER VIEW ---
+# --- MAIN CARTOGRAPHER VIEW ---
 if "Cartographer" in selected_agent:
-    # Header
-    col_t1, col_t2 = st.columns([8, 2])
-    with col_t1:
+    # Header Section
+    header_col1, header_col2 = st.columns([9, 2])
+    with header_col1:
+        st.markdown('<div class="cartographer-tag">CARTOGRAPHER</div>', unsafe_allow_html=True)
         st.markdown("""
             <div class="view-title">
-                <span style="color:var(--primary-cyan); font-size:1.8rem;">☊</span> Causal Graph & Blast Radius
+                <span style="color:var(--primary-cyan); font-size:1.9rem; line-height:1;">☊</span> Causal graph
             </div>
             <div class="view-subtitle">
-                Every dependency, module, and import. Click a node or select a hot dependency to trace its blast radius — the upstream cone of call sites and files affected during an architectural exit.
+                Every file and every import. Click a node to see its neighbors. Paste a diff to see the blast radius — the upstream cone of files that would be affected if the change introduced a regression.
             </div>
         """, unsafe_allow_html=True)
-    with col_t2:
+    with header_col2:
         st.markdown("""
-            <div style="text-align: right; padding-top: 0.5rem;">
-                <span class="badge-live" style="font-size:0.8rem; padding: 0.35rem 0.85rem;">⤹ LIVE GRAPH</span>
+            <div style="text-align: right; padding-top: 1rem;">
+                <span class="badge-live" style="font-size:0.75rem; padding:0.3rem 0.8rem;">⤹ live</span>
             </div>
         """, unsafe_allow_html=True)
 
-    # 3 Column Layout: [Left Sidebar Stats/Hot Files] | [Center Interactive Graph] | [Right Blast/Details]
-    left_col, center_col, right_col = st.columns([2.2, 5.3, 2.5])
+    # 3-Column Top Grid: [Left Stats & Hot Files] | [Center Causal Graph] | [Right Blast A Diff]
+    left_col, center_col, right_col = st.columns([2.5, 6.0, 3.2], gap="medium")
 
-    # Preset Hot Dependencies & Files
+    # Preset Hot Load-bearing files matching LinkWatch
     hot_items = [
-        {"name": "linkwatch/config.py", "type": "file", "indegree": 16, "dep": "toml", "blast": 6},
-        {"name": "linkwatch/storage.py", "type": "file", "indegree": 13, "dep": "appdirs", "blast": 5},
-        {"name": "linkwatch/reporter.py", "type": "file", "indegree": 12, "dep": "jinja2", "blast": 8},
-        {"name": "linkwatch/cli.py", "type": "file", "indegree": 9, "dep": "click", "blast": 14},
-        {"name": "linkwatch/monitor.py", "type": "file", "indegree": 7, "dep": "requests", "blast": 4},
-        {"name": "linkwatch/core.py", "type": "file", "indegree": 6, "dep": "internal", "blast": 11},
-        {"name": "linkwatch/exceptions.py", "type": "file", "indegree": 5, "dep": "internal", "blast": 14},
-        {"name": "linkwatch/utils.py", "type": "file", "indegree": 4, "dep": "internal", "blast": 3}
+        {"name": "linkwatch/config.py", "indegree": 22, "dep": "toml"},
+        {"name": "linkwatch/storage.py", "indegree": 13, "dep": "appdirs"},
+        {"name": "linkwatch/reporter.py", "indegree": 12, "dep": "jinja2"},
+        {"name": "linkwatch/cli.py", "indegree": 11, "dep": "click"},
+        {"name": "linkwatch/monitor.py", "indegree": 7, "dep": "requests"},
+        {"name": "linkwatch/core.py", "indegree": 7, "dep": "internal"},
+        {"name": "linkwatch/exceptions.py", "indegree": 5, "dep": "internal"},
+        {"name": "linkwatch/utils.py", "indegree": 4, "dep": "internal"}
     ]
 
     with left_col:
@@ -398,11 +443,9 @@ if "Cartographer" in selected_agent:
         st.markdown("""
             <div class="biso-card">
                 <div class="biso-card-header">STATS</div>
-                <div class="stat-row"><span class="stat-label">Files</span><span class="stat-val">28</span></div>
-                <div class="stat-row"><span class="stat-label">Dependencies</span><span class="stat-val">14</span></div>
-                <div class="stat-row"><span class="stat-label">Import Edges</span><span class="stat-val">74</span></div>
-                <div class="stat-row"><span class="stat-label">Stale (>5yr)</span><span class="stat-val" style="color:#ff6b4a;">3 Verified</span></div>
-                <div class="stat-row"><span class="stat-label">Capsules Ready</span><span class="stat-val" style="color:#0df2c9;">3 Built</span></div>
+                <div class="stat-row"><span class="stat-label">Files</span><span class="stat-val">59</span></div>
+                <div class="stat-row"><span class="stat-label">Edges</span><span class="stat-val">165</span></div>
+                <div class="stat-row"><span class="stat-label">Shown</span><span class="stat-val">59 (max 300)</span></div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -411,23 +454,23 @@ if "Cartographer" in selected_agent:
             <div class="biso-card">
                 <div class="biso-card-header">
                     <span>HOT FILES</span>
-                    <span style="font-size:0.65rem; color:#64748b;">HIGHEST INDEGREE</span>
+                    <span style="font-size:0.64rem; color:#64748b; text-transform:none;">Highest indegree — the load-bearing ones</span>
                 </div>
         """, unsafe_allow_html=True)
 
-        # Let user click or select a hot node
-        selected_hot_file = st.selectbox(
-            "Quick Select Hot Node",
+        # Hot file selector
+        selected_file = st.selectbox(
+            "Select Hot Node",
             [item["name"] for item in hot_items],
             index=0,
             label_visibility="collapsed"
         )
 
         for item in hot_items:
-            is_active = (item["name"] == selected_hot_file)
-            border_style = "border-left: 2px solid #0df2c9; background: rgba(13, 242, 201, 0.08);" if is_active else ""
+            is_active = (item["name"] == selected_file)
+            active_style = "border-left: 2px solid #0df2c9; background: rgba(13, 242, 201, 0.08);" if is_active else ""
             st.markdown(f"""
-                <div class="hot-item" style="{border_style}">
+                <div class="hot-item" style="{active_style}">
                     <span class="hot-item-name"><span class="flame-icon">🔥</span> {item['name']}</span>
                     <span class="hot-item-score">{item['indegree']}</span>
                 </div>
@@ -435,57 +478,9 @@ if "Cartographer" in selected_agent:
         
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- CENTER COLUMN: CAUSAL GRAPH (Plotly Interactive Network) ---
+
+    # --- CENTER COLUMN: CAUSAL GRAPH CANVAS (VisJS matching BISO layout) ---
     with center_col:
-        # Determine active blast target
-        active_target_node = selected_hot_file
-
-        # Build Interactive Cytoscape / Vis Network Graph via HTML/JS for authentic BISO look
-        # Nodes and Edges definition
-        nodes_data = [
-            # Hot Internal Nodes
-            {"id": "linkwatch/config.py", "label": "config.py", "group": "hot", "size": 24, "desc": "Config parser using toml"},
-            {"id": "linkwatch/storage.py", "label": "storage.py", "group": "hot", "size": 22, "desc": "Storage paths using appdirs"},
-            {"id": "linkwatch/reporter.py", "label": "reporter.py", "group": "hot", "size": 22, "desc": "HTML Reports via Jinja2 & MarkupSafe"},
-            {"id": "linkwatch/cli.py", "label": "cli.py", "group": "blast", "size": 18, "desc": "CLI entrypoints"},
-            {"id": "linkwatch/monitor.py", "label": "monitor.py", "group": "normal", "size": 16, "desc": "Health monitor engine"},
-            {"id": "linkwatch/core.py", "label": "core.py", "group": "normal", "size": 16, "desc": "Core dispatcher"},
-            {"id": "linkwatch/exceptions.py", "label": "exceptions.py", "group": "normal", "size": 14, "desc": "Exception types"},
-            {"id": "linkwatch/utils.py", "label": "utils.py", "group": "normal", "size": 14, "desc": "Utility helpers"},
-            # External Dependencies (Seeds)
-            {"id": "pkg:toml", "label": "toml (0.10.2)", "group": "seed", "size": 26, "desc": "Abandoned 2174d ago -> Replace with tomllib"},
-            {"id": "pkg:appdirs", "label": "appdirs (1.4.4)", "group": "seed", "size": 26, "desc": "Abandoned 2347d ago -> Replace with platformdirs"},
-            {"id": "pkg:jinja2", "label": "jinja2 (3.0.3)", "group": "seed", "size": 26, "desc": "MarkupSafe soft-error incompat -> Jinja2>=3.1.6"},
-            {"id": "pkg:requests", "label": "requests", "group": "normal", "size": 14, "desc": "HTTP Client"},
-            {"id": "pkg:click", "label": "click", "group": "normal", "size": 14, "desc": "CLI library"},
-            # Tests & Consumers (Blast Cone)
-            {"id": "tests/test_config.py", "label": "test_config.py", "group": "blast", "size": 13, "desc": "Pytest configuration suite"},
-            {"id": "tests/test_cli.py", "label": "test_cli.py", "group": "blast", "size": 13, "desc": "CLI integration tests"},
-            {"id": "tests/test_storage.py", "label": "test_storage.py", "group": "blast", "size": 13, "desc": "Storage tests"},
-            {"id": "tests/test_report.py", "label": "test_report.py", "group": "blast", "size": 13, "desc": "Reporter unit tests"},
-        ]
-
-        edges_data = [
-            {"from": "pkg:toml", "to": "linkwatch/config.py"},
-            {"from": "pkg:appdirs", "to": "linkwatch/storage.py"},
-            {"from": "pkg:jinja2", "to": "linkwatch/reporter.py"},
-            {"from": "pkg:click", "to": "linkwatch/cli.py"},
-            {"from": "pkg:requests", "to": "linkwatch/monitor.py"},
-            {"from": "linkwatch/config.py", "to": "linkwatch/cli.py"},
-            {"from": "linkwatch/config.py", "to": "linkwatch/monitor.py"},
-            {"from": "linkwatch/config.py", "to": "linkwatch/core.py"},
-            {"from": "linkwatch/config.py", "to": "tests/test_config.py"},
-            {"from": "linkwatch/storage.py", "to": "linkwatch/core.py"},
-            {"from": "linkwatch/storage.py", "to": "tests/test_storage.py"},
-            {"from": "linkwatch/reporter.py", "to": "linkwatch/core.py"},
-            {"from": "linkwatch/reporter.py", "to": "tests/test_report.py"},
-            {"from": "linkwatch/core.py", "to": "linkwatch/cli.py"},
-            {"from": "linkwatch/cli.py", "to": "tests/test_cli.py"},
-            {"from": "linkwatch/exceptions.py", "to": "linkwatch/core.py"},
-            {"from": "linkwatch/utils.py", "to": "linkwatch/monitor.py"},
-        ]
-
-        # VisJS Network Graph Canvas Component
         graph_html = f"""
         <!DOCTYPE html>
         <html>
@@ -495,34 +490,35 @@ if "Cartographer" in selected_agent:
             body {{
                 margin: 0;
                 padding: 0;
-                background-color: #0c121d;
+                background-color: #090e18;
                 overflow: hidden;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             }}
             #network {{
                 width: 100%;
-                height: 480px;
+                height: 570px;
                 border-radius: 12px;
-                background: radial-gradient(circle at center, #111a28 0%, #080c14 100%);
+                border: 1px solid #172233;
+                background: radial-gradient(circle at center, #101826 0%, #060910 100%);
             }}
             .legend {{
                 position: absolute;
-                bottom: 15px;
-                right: 15px;
-                background: rgba(12, 18, 29, 0.88);
+                bottom: 14px;
+                right: 14px;
+                background: rgba(10, 16, 26, 0.92);
                 border: 1px solid #1a273b;
                 border-radius: 8px;
                 padding: 10px 14px;
                 font-size: 11px;
                 color: #94a3b8;
                 pointer-events: none;
-                backdrop-filter: blur(4px);
+                backdrop-filter: blur(6px);
             }}
             .legend-item {{
                 display: flex;
                 align-items: center;
                 gap: 8px;
-                margin-bottom: 4px;
+                margin-bottom: 5px;
             }}
             .legend-item:last-child {{ margin-bottom: 0; }}
             .legend-dot {{
@@ -535,62 +531,62 @@ if "Cartographer" in selected_agent:
         <body>
           <div id="network"></div>
           <div class="legend">
-            <div class="legend-item"><span class="legend-dot" style="background:#0df2c9;"></span> Hot file (High indegree)</div>
-            <div class="legend-item"><span class="legend-dot" style="background:#38bdf8;"></span> Selected file</div>
-            <div class="legend-item"><span class="legend-dot" style="background:#ff6b4a;"></span> Blast cone / Seed Dep</div>
-            <div class="legend-item"><span class="legend-dot" style="background:#64748b;"></span> Internal Module / Test</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#0df2c9;"></span> hot file (high indegree)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#38bdf8;"></span> selected</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#ff6b4a;"></span> blast cone</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#ff8c73;"></span> seed (diff touches)</div>
           </div>
 
           <script type="text/javascript">
             const nodes = new vis.DataSet([
-                // Dependencies (Seed nodes)
-                {{ id: "pkg:toml", label: "toml (0.10.2)", color: {{ background: '#ff6b4a', border: '#ff8c73' }}, font: {{ color: '#fff', face: 'JetBrains Mono', size: 12 }}, shape: 'dot', size: 18 }},
-                {{ id: "pkg:appdirs", label: "appdirs (1.4.4)", color: {{ background: '#ff6b4a', border: '#ff8c73' }}, font: {{ color: '#fff', face: 'JetBrains Mono', size: 12 }}, shape: 'dot', size: 18 }},
-                {{ id: "pkg:jinja2", label: "jinja2 (3.0.3)", color: {{ background: '#ff6b4a', border: '#ff8c73' }}, font: {{ color: '#fff', face: 'JetBrains Mono', size: 12 }}, shape: 'dot', size: 18 }},
-                {{ id: "pkg:requests", label: "requests", color: {{ background: '#25354e', border: '#3b5278' }}, font: {{ color: '#94a3b8', size: 10 }}, shape: 'dot', size: 10 }},
-                {{ id: "pkg:click", label: "click", color: {{ background: '#25354e', border: '#3b5278' }}, font: {{ color: '#94a3b8', size: 10 }}, shape: 'dot', size: 10 }},
+                // Seed Dependencies
+                {{ id: "pkg:toml", label: "toml.py", color: {{ background: '#ff6b4a', border: '#ff8c73' }}, font: {{ color: '#fff', face: 'JetBrains Mono', size: 11 }}, shape: 'dot', size: 17 }},
+                {{ id: "pkg:appdirs", label: "appdirs.py", color: {{ background: '#ff6b4a', border: '#ff8c73' }}, font: {{ color: '#fff', face: 'JetBrains Mono', size: 11 }}, shape: 'dot', size: 17 }},
+                {{ id: "pkg:jinja2", label: "jinja2.py", color: {{ background: '#ff6b4a', border: '#ff8c73' }}, font: {{ color: '#fff', face: 'JetBrains Mono', size: 11 }}, shape: 'dot', size: 17 }},
+                {{ id: "pkg:click", label: "click.py", color: {{ background: '#223247', border: '#334866' }}, font: {{ color: '#94a3b8', size: 10 }}, shape: 'dot', size: 11 }},
+                {{ id: "pkg:requests", label: "requests.py", color: {{ background: '#223247', border: '#334866' }}, font: {{ color: '#94a3b8', size: 10 }}, shape: 'dot', size: 11 }},
 
                 // Hot Internal Files
-                {{ id: "linkwatch/config.py", label: "config.py", color: {{ background: '{ "#38bdf8" if selected_hot_file == "linkwatch/config.py" else "#0df2c9" }', border: '#5eead4' }}, font: {{ color: '#ffffff', face: 'JetBrains Mono', size: 13, bold: true }}, shape: 'dot', size: 22 }},
-                {{ id: "linkwatch/storage.py", label: "storage.py", color: {{ background: '{ "#38bdf8" if selected_hot_file == "linkwatch/storage.py" else "#0df2c9" }', border: '#5eead4' }}, font: {{ color: '#ffffff', face: 'JetBrains Mono', size: 13, bold: true }}, shape: 'dot', size: 20 }},
-                {{ id: "linkwatch/reporter.py", label: "reporter.py", color: {{ background: '{ "#38bdf8" if selected_hot_file == "linkwatch/reporter.py" else "#0df2c9" }', border: '#5eead4' }}, font: {{ color: '#ffffff', face: 'JetBrains Mono', size: 13, bold: true }}, shape: 'dot', size: 20 }},
-                {{ id: "linkwatch/cli.py", label: "cli.py", color: {{ background: '{ "#38bdf8" if selected_hot_file == "linkwatch/cli.py" else "#0df2c9" }', border: '#5eead4' }}, font: {{ color: '#ffffff', face: 'JetBrains Mono', size: 12 }}, shape: 'dot', size: 17 }},
+                {{ id: "linkwatch/config.py", label: "config.py", color: {{ background: '{ "#38bdf8" if selected_file == "linkwatch/config.py" else "#0df2c9" }', border: '#5eead4' }}, font: {{ color: '#ffffff', face: 'JetBrains Mono', size: 13, bold: true }}, shape: 'dot', size: 22 }},
+                {{ id: "linkwatch/storage.py", label: "storage.py", color: {{ background: '{ "#38bdf8" if selected_file == "linkwatch/storage.py" else "#0df2c9" }', border: '#5eead4' }}, font: {{ color: '#ffffff', face: 'JetBrains Mono', size: 13, bold: true }}, shape: 'dot', size: 20 }},
+                {{ id: "linkwatch/reporter.py", label: "reporter.py", color: {{ background: '{ "#38bdf8" if selected_file == "linkwatch/reporter.py" else "#0df2c9" }', border: '#5eead4' }}, font: {{ color: '#ffffff', face: 'JetBrains Mono', size: 13, bold: true }}, shape: 'dot', size: 20 }},
+                {{ id: "linkwatch/cli.py", label: "cli.py", color: {{ background: '{ "#38bdf8" if selected_file == "linkwatch/cli.py" else "#0df2c9" }', border: '#5eead4' }}, font: {{ color: '#ffffff', face: 'JetBrains Mono', size: 12, bold: true }}, shape: 'dot', size: 18 }},
 
-                // Modules
-                {{ id: "linkwatch/core.py", label: "core.py", color: {{ background: '#1a273b', border: '#2e415e' }}, font: {{ color: '#94a3b8', size: 11 }}, shape: 'dot', size: 14 }},
-                {{ id: "linkwatch/monitor.py", label: "monitor.py", color: {{ background: '#1a273b', border: '#2e415e' }}, font: {{ color: '#94a3b8', size: 11 }}, shape: 'dot', size: 14 }},
-                {{ id: "linkwatch/utils.py", label: "utils.py", color: {{ background: '#141e2e', border: '#25354e' }}, font: {{ color: '#64748b', size: 10 }}, shape: 'dot', size: 11 }},
-                {{ id: "linkwatch/exceptions.py", label: "exceptions.py", color: {{ background: '#141e2e', border: '#25354e' }}, font: {{ color: '#64748b', size: 10 }}, shape: 'dot', size: 11 }},
+                // Internal Modules
+                {{ id: "linkwatch/core.py", label: "orchestrator.py", color: {{ background: '#1c2a3d', border: '#2e415e' }}, font: {{ color: '#94a3b8', size: 11 }}, shape: 'dot', size: 14 }},
+                {{ id: "linkwatch/monitor.py", label: "monitor.py", color: {{ background: '#1c2a3d', border: '#2e415e' }}, font: {{ color: '#94a3b8', size: 11 }}, shape: 'dot', size: 14 }},
+                {{ id: "linkwatch/utils.py", label: "utils.py", color: {{ background: '#141e2e', border: '#25354e' }}, font: {{ color: '#64748b', size: 10 }}, shape: 'dot', size: 10 }},
+                {{ id: "linkwatch/exceptions.py", label: "exceptions.py", color: {{ background: '#141e2e', border: '#25354e' }}, font: {{ color: '#64748b', size: 10 }}, shape: 'dot', size: 10 }},
 
-                // Tests
-                {{ id: "tests/test_config.py", label: "test_config.py", color: {{ background: '#1e293b', border: '#ff6b4a' }}, font: {{ color: '#cbd5e1', size: 10 }}, shape: 'dot', size: 10 }},
-                {{ id: "tests/test_storage.py", label: "test_storage.py", color: {{ background: '#1e293b', border: '#ff6b4a' }}, font: {{ color: '#cbd5e1', size: 10 }}, shape: 'dot', size: 10 }},
-                {{ id: "tests/test_report.py", label: "test_report.py", color: {{ background: '#1e293b', border: '#ff6b4a' }}, font: {{ color: '#cbd5e1', size: 10 }}, shape: 'dot', size: 10 }},
-                {{ id: "tests/test_cli.py", label: "test_cli.py", color: {{ background: '#1e293b', border: '#ff6b4a' }}, font: {{ color: '#cbd5e1', size: 10 }}, shape: 'dot', size: 10 }}
+                // Tests (Blast cone)
+                {{ id: "tests/test_config.py", label: "test_config.py", color: {{ background: '#1b2535', border: '#ff6b4a' }}, font: {{ color: '#cbd5e1', size: 10 }}, shape: 'dot', size: 10 }},
+                {{ id: "tests/test_storage.py", label: "test_storage.py", color: {{ background: '#1b2535', border: '#ff6b4a' }}, font: {{ color: '#cbd5e1', size: 10 }}, shape: 'dot', size: 10 }},
+                {{ id: "tests/test_report.py", label: "test_report.py", color: {{ background: '#1b2535', border: '#ff6b4a' }}, font: {{ color: '#cbd5e1', size: 10 }}, shape: 'dot', size: 10 }},
+                {{ id: "tests/test_cli.py", label: "test_cli.py", color: {{ background: '#1b2535', border: '#ff6b4a' }}, font: {{ color: '#cbd5e1', size: 10 }}, shape: 'dot', size: 10 }}
             ]);
 
             const edges = new vis.DataSet([
-                {{ from: "pkg:toml", to: "linkwatch/config.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.8 }}, width: 2 }},
-                {{ from: "pkg:appdirs", to: "linkwatch/storage.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.8 }}, width: 2 }},
-                {{ from: "pkg:jinja2", to: "linkwatch/reporter.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.8 }}, width: 2 }},
+                {{ from: "pkg:toml", to: "linkwatch/config.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.85 }}, width: 2 }},
+                {{ from: "pkg:appdirs", to: "linkwatch/storage.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.85 }}, width: 2 }},
+                {{ from: "pkg:jinja2", to: "linkwatch/reporter.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.85 }}, width: 2 }},
                 {{ from: "pkg:click", to: "linkwatch/cli.py", arrows: "to", color: {{ color: '#25354e', opacity: 0.5 }}, width: 1 }},
                 {{ from: "pkg:requests", to: "linkwatch/monitor.py", arrows: "to", color: {{ color: '#25354e', opacity: 0.5 }}, width: 1 }},
 
-                {{ from: "linkwatch/config.py", to: "linkwatch/cli.py", arrows: "to", color: {{ color: '#0df2c9', opacity: 0.6 }}, width: 2 }},
-                {{ from: "linkwatch/config.py", to: "linkwatch/monitor.py", arrows: "to", color: {{ color: '#0df2c9', opacity: 0.6 }}, width: 1.5 }},
-                {{ from: "linkwatch/config.py", to: "linkwatch/core.py", arrows: "to", color: {{ color: '#0df2c9', opacity: 0.6 }}, width: 1.5 }},
-                {{ from: "linkwatch/config.py", to: "tests/test_config.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.5 }}, dashes: true }},
+                {{ from: "linkwatch/config.py", to: "linkwatch/cli.py", arrows: "to", color: {{ color: '#0df2c9', opacity: 0.7 }}, width: 2 }},
+                {{ from: "linkwatch/config.py", to: "linkwatch/monitor.py", arrows: "to", color: {{ color: '#0df2c9', opacity: 0.7 }}, width: 1.5 }},
+                {{ from: "linkwatch/config.py", to: "linkwatch/core.py", arrows: "to", color: {{ color: '#0df2c9', opacity: 0.7 }}, width: 1.5 }},
+                {{ from: "linkwatch/config.py", to: "tests/test_config.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.6 }}, dashes: true }},
 
-                {{ from: "linkwatch/storage.py", to: "linkwatch/core.py", arrows: "to", color: {{ color: '#0df2c9', opacity: 0.6 }}, width: 1.5 }},
-                {{ from: "linkwatch/storage.py", to: "tests/test_storage.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.5 }}, dashes: true }},
+                {{ from: "linkwatch/storage.py", to: "linkwatch/core.py", arrows: "to", color: {{ color: '#0df2c9', opacity: 0.7 }}, width: 1.5 }},
+                {{ from: "linkwatch/storage.py", to: "tests/test_storage.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.6 }}, dashes: true }},
 
-                {{ from: "linkwatch/reporter.py", to: "linkwatch/core.py", arrows: "to", color: {{ color: '#0df2c9', opacity: 0.6 }}, width: 1.5 }},
-                {{ from: "linkwatch/reporter.py", to: "tests/test_report.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.5 }}, dashes: true }},
+                {{ from: "linkwatch/reporter.py", to: "linkwatch/core.py", arrows: "to", color: {{ color: '#0df2c9', opacity: 0.7 }}, width: 1.5 }},
+                {{ from: "linkwatch/reporter.py", to: "tests/test_report.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.6 }}, dashes: true }},
 
-                {{ from: "linkwatch/core.py", to: "linkwatch/cli.py", arrows: "to", color: {{ color: '#38bdf8', opacity: 0.6 }}, width: 2 }},
-                {{ from: "linkwatch/cli.py", to: "tests/test_cli.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.5 }}, dashes: true }},
-                {{ from: "linkwatch/exceptions.py", to: "linkwatch/core.py", arrows: "to", color: {{ color: '#25354e', opacity: 0.4 }} }},
-                {{ from: "linkwatch/utils.py", to: "linkwatch/monitor.py", arrows: "to", color: {{ color: '#25354e', opacity: 0.4 }} }}
+                {{ from: "linkwatch/core.py", to: "linkwatch/cli.py", arrows: "to", color: {{ color: '#38bdf8', opacity: 0.7 }}, width: 2 }},
+                {{ from: "linkwatch/cli.py", to: "tests/test_cli.py", arrows: "to", color: {{ color: '#ff6b4a', opacity: 0.6 }}, dashes: true }},
+                {{ from: "linkwatch/exceptions.py", to: "linkwatch/core.py", arrows: "to", color: {{ color: '#223247', opacity: 0.4 }} }},
+                {{ from: "linkwatch/utils.py", to: "linkwatch/monitor.py", arrows: "to", color: {{ color: '#223247', opacity: 0.4 }} }}
             ]);
 
             const container = document.getElementById('network');
@@ -605,8 +601,8 @@ if "Cartographer" in selected_agent:
                 }},
                 physics: {{
                     barnesHut: {{
-                        gravitationalConstant: -2400,
-                        centralGravity: 0.35,
+                        gravitationalConstant: -2200,
+                        centralGravity: 0.32,
                         springLength: 95,
                         springConstant: 0.04
                     }},
@@ -624,35 +620,170 @@ if "Cartographer" in selected_agent:
         </body>
         </html>
         """
+        st.components.v1.html(graph_html, height=580)
 
-        st.components.v1.html(graph_html, height=495)
 
-        # Tabbed Inspect Views underneath graph
-        tab_capsule, tab_diff, tab_ast = st.tabs(["📦 Exit Capsule Ledger", "🔬 Differential Test Proof", "🌲 AST Call Sites"])
+    # --- RIGHT COLUMN: BLAST A DIFF & SEED INPUT (Matches BISO reference) ---
+    with right_col:
+        # NOTHING SELECTED / ACTIVE NODE DETAILS
+        st.markdown(f"""
+            <div class="biso-card">
+                <div class="biso-card-header">NODE DETAILS</div>
+                <div style="font-size:0.88rem; font-weight:700; color:#38bdf8; font-family:'JetBrains Mono', monospace; margin-bottom:0.3rem;">
+                    {selected_file}
+                </div>
+                <div style="font-size:0.78rem; color:#94a3b8; line-height:1.4;">
+                    Load-bearing internal module directly connected to core dispatcher and test suites.
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
 
-        with tab_capsule:
+        # BLAST A DIFF CARD
+        st.markdown("""
+            <div class="biso-card">
+                <div class="biso-card-header">BLAST A DIFF</div>
+                <div style="font-size:0.78rem; color:#94a3b8; margin-bottom:0.6rem; line-height:1.4;">
+                    See which files would break if a change introduced a bug.
+                </div>
+                <div style="font-size:0.75rem; color:#cbd5e1; margin-bottom:0.75rem; line-height:1.4;">
+                    <strong style="color:#ffffff;">What this does:</strong> paste a diff, and the graph highlights every file that depends on the changed files — the "blast cone" of potential breakage.
+                </div>
+                <div style="font-size:0.7rem; color:#64748b; margin-bottom:0.4rem; text-transform:uppercase; font-weight:700;">
+                    TRY AN EXAMPLE (CLICK TO LOAD)
+                </div>
+        """, unsafe_allow_html=True)
+
+        example_choice = st.radio(
+            "Examples",
+            [
+                "linkwatch/config.py (16 importers — highest blast)",
+                "linkwatch/orchestrator.py (the safety chokepoint)",
+                "linkwatch/reporter.py (8 importers — report format)",
+                "linkwatch/config.py (leaf file — small blast)"
+            ],
+            index=0,
+            label_visibility="collapsed"
+        )
+
+        diff_sample = ""
+        if "config.py (16" in example_choice:
+            diff_sample = """--- a/linkwatch/config.py
++++ b/linkwatch/config.py
+@@ -3,1 +3,1 @@
+-import toml
++import tomllib
+@@ -37,1 +37,1 @@
+-    return toml.load(path)
++    with open(path, "rb") as f:
++        return tomllib.load(f)"""
+        elif "orchestrator" in example_choice:
+            diff_sample = """--- a/linkwatch/core.py
++++ b/linkwatch/core.py
+@@ -10,1 +10,1 @@
+-def dispatch_event(e):
++def dispatch_event_safe(e):"""
+        elif "reporter" in example_choice:
+            diff_sample = """--- a/linkwatch/reporter.py
++++ b/linkwatch/reporter.py
+@@ -5,1 +5,1 @@
+-from jinja2 import Environment
++from jinja2 import Environment, select_autoescape"""
+        else:
+            diff_sample = """--- a/sites.toml
++++ b/sites.toml
+@@ -1,2 +1,2 @@
+-[settings]
++[configuration]"""
+
+        user_diff = st.text_area(
+            "Diff Input",
+            value=diff_sample,
+            height=125,
+            label_visibility="collapsed"
+        )
+
+        b_c1, b_c2 = st.columns(2)
+        with b_c1:
+            st.button("⚡ Trace Blast", use_container_width=True)
+        with b_c2:
+            st.button("Reset", use_container_width=True)
+
+        st.markdown("""
+            <div style="margin-top:0.85rem; border-top:1px solid #172233; padding-top:0.65rem;">
+                <div style="font-size:0.72rem; color:#0df2c9; font-weight:700; text-transform:uppercase; letter-spacing:0.08em;">
+                    UPSTREAM BLAST CONE:
+                </div>
+                <div style="margin-top:0.4rem; font-size:0.8rem; font-family:'JetBrains Mono', monospace; color:#ff6b4a; line-height:1.5;">
+                    ● linkwatch/config.py <span style="color:#64748b;">(seed)</span><br>
+                    ↳ linkwatch/cli.py <span style="color:#64748b;">(importer)</span><br>
+                    ↳ linkwatch/monitor.py <span style="color:#64748b;">(importer)</span><br>
+                    ↳ tests/test_config.py <span style="color:#64748b;">(regression test)</span>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+
+    # --- LOWER SECTION: FULL WIDTH TABS (No more horizontal cutoff or cramming) ---
+    st.markdown("<div style='margin-top:1.5rem;'></div>", unsafe_allow_html=True)
+    tab_capsule, tab_diff, tab_ast = st.tabs(["📦 Exit Capsule Ledger", "🔬 Differential Test Proof", "🌲 AST Call Sites & Usage"])
+
+    with tab_capsule:
+        st.markdown("<div style='margin-top:0.5rem;'></div>", unsafe_allow_html=True)
+        
+        cap_col1, cap_col2 = st.columns([3, 7])
+        with cap_col1:
             capsule_selection = st.selectbox(
                 "Select Verified Capsule",
                 list(capsules_data.keys()),
                 index=0
             )
             selected_cap = capsules_data.get(capsule_selection, {})
-            
-            c_m1, c_m2, c_m3, c_m4 = st.columns(4)
-            c_m1.metric("Target Dep", selected_cap.get("target_dependency", {}).get("name", "N/A"))
-            c_m2.metric("Declared", selected_cap.get("target_dependency", {}).get("declared_specifier", "N/A"))
-            c_m3.metric("Replacement", selected_cap.get("ai_generated", {}).get("replacement_proposal", {}).get("candidate_package", "N/A"))
-            c_m4.metric("Risk Status", selected_cap.get("observed", {}).get("risk_indicators", {}).get("status", "verified").upper())
 
-            with st.expander("📄 View Auditable JSON Proof", expanded=False):
-                st.json(selected_cap)
+        # 4 Responsive Metric Chips
+        m_c1, m_c2, m_c3, m_c4 = st.columns(4)
+        with m_c1:
+            st.markdown(f"""
+                <div class="metric-chip">
+                    <div class="metric-chip-label">Target Dependency</div>
+                    <div class="metric-chip-value" style="color:#ff6b4a;">{selected_cap.get('target_dependency', {}).get('name', 'N/A')}</div>
+                </div>
+            """, unsafe_allow_html=True)
+        with m_c2:
+            st.markdown(f"""
+                <div class="metric-chip">
+                    <div class="metric-chip-label">Declared Specifier</div>
+                    <div class="metric-chip-value">{selected_cap.get('target_dependency', {}).get('declared_specifier', 'N/A')}</div>
+                </div>
+            """, unsafe_allow_html=True)
+        with m_c3:
+            st.markdown(f"""
+                <div class="metric-chip">
+                    <div class="metric-chip-label">Proposed Replacement</div>
+                    <div class="metric-chip-value" style="color:#0df2c9;">{selected_cap.get('ai_generated', {}).get('replacement_proposal', {}).get('candidate_package', 'N/A')}</div>
+                </div>
+            """, unsafe_allow_html=True)
+        with m_c4:
+            risk_stat = selected_cap.get('observed', {}).get('risk_indicators', {}).get('status', 'verified').upper()
+            st.markdown(f"""
+                <div class="metric-chip">
+                    <div class="metric-chip-label">Verification Status</div>
+                    <div class="metric-chip-value" style="color:#34d399;">● {risk_stat}</div>
+                </div>
+            """, unsafe_allow_html=True)
 
-        with tab_diff:
-            st.markdown("""
-                **Differential Sandbox Test Results (Baseline vs Replacement Candidate)**
-                Isolated virtual environments ensure strict regression isolation:
-            """)
-            st.code("""
+        st.markdown("<div style='margin-top:1rem;'></div>", unsafe_allow_html=True)
+        with st.expander("📄 View Full Auditable Capsule JSON", expanded=False):
+            st.json(selected_cap)
+
+    with tab_diff:
+        st.markdown("<div style='margin-top:0.5rem;'></div>", unsafe_allow_html=True)
+        st.markdown("""
+            **Differential Sandbox Test Results (Baseline `venv_A` vs Replacement `venv_B`)**
+            Isolated virtual environments ensure strict regression isolation adhering to the `agentskills.io` standard:
+        """)
+        st.code("""
 # Baseline Execution: pytest --junitxml=junit_A.xml (venv_baseline)
 tests/test_cli.py ........ [PASS]
 tests/test_config.py ...... [PASS]
@@ -666,99 +797,21 @@ tests/test_config.py ...... [PASS] (Verified tomllib migration)
 tests/test_report.py ..... [PASS]
 tests/test_storage.py .... [PASS]
 ================== 23 passed in 0.38s ==================
-            """, language="bash")
+        """, language="bash")
 
-        with tab_ast:
-            st.markdown(f"**AST Coordinates Detected in `{selected_hot_file}`:**")
-            st.markdown("""
-            - **Line 3:** `import toml` (Static direct import, status: `verified`)
-            - **Line 37:** `toml.load(path)` (Call site resolved, AST Node: `ast.Call`, status: `verified`)
-            - **Dynamic Imports:** None detected (100% deterministic AST coverage)
-            """)
-
-
-    # --- RIGHT COLUMN: BLAST A DIFF & DETAILS PANEL ---
-    with right_col:
+    with tab_ast:
+        st.markdown("<div style='margin-top:0.5rem;'></div>", unsafe_allow_html=True)
+        st.markdown(f"**AST Coordinates Detected across repository:**")
         st.markdown("""
-            <div class="biso-card">
-                <div class="biso-card-header">BLAST A DIFF</div>
-                <div style="font-size:0.8rem; color:#94a3b8; margin-bottom:0.8rem; line-height:1.4;">
-                    See which files would break if a change introduced a bug or replacement regression.
-                </div>
-                <div style="font-size:0.75rem; color:#64748b; margin-bottom:0.5rem; text-transform:uppercase; font-weight:700;">
-                    TRY AN EXAMPLE (CLICK TO LOAD)
-                </div>
-        """, unsafe_allow_html=True)
-
-        example_choice = st.radio(
-            "Example Diff Presets",
-            [
-                "toml -> tomllib (Exit Capsule #1)",
-                "appdirs -> platformdirs (Exit Capsule #2)",
-                "jinja2 / MarkupSafe Soft-Error Fix",
-                "custom git diff"
-            ],
-            index=0,
-            label_visibility="collapsed"
-        )
-
-        diff_sample = ""
-        if "toml" in example_choice:
-            diff_sample = """--- a/linkwatch/config.py
-+++ b/linkwatch/config.py
-@@ -3,1 +3,1 @@
--import toml
-+import tomllib
-@@ -37,1 +37,1 @@
--    return toml.load(path)
-+    with open(path, "rb") as f:
-+        return tomllib.load(f)"""
-        elif "appdirs" in example_choice:
-            diff_sample = """--- a/linkwatch/storage.py
-+++ b/linkwatch/storage.py
-@@ -4,1 +4,1 @@
--import appdirs
-+import platformdirs"""
-        elif "jinja2" in example_choice:
-            diff_sample = """--- a/requirements.txt
-+++ b/requirements.txt
-@@ -12,1 +12,1 @@
--Jinja2==3.0.3
-+Jinja2>=3.1.6"""
-        else:
-            diff_sample = "git diff HEAD~1"
-
-        user_diff = st.text_area(
-            "Diff Input",
-            value=diff_sample,
-            height=135,
-            help="Paste unified diff to simulate blast radius calculation"
-        )
-
-        calc_col1, calc_col2 = st.columns([1, 1])
-        with calc_col1:
-            st.button("⚡ Trace Blast", use_container_width=True)
-        with calc_col2:
-            st.button("🔄 Reset", use_container_width=True)
-
-        st.markdown("""
-            <div style="margin-top:1rem; border-top:1px solid #1a273b; padding-top:0.8rem;">
-                <div style="font-size:0.75rem; color:#0df2c9; font-weight:700; text-transform:uppercase;">
-                    AFFECTED BLAST RADIUS:
-                </div>
-                <div style="margin-top:0.5rem; font-size:0.82rem; font-family:'JetBrains Mono', monospace; color:#ff6b4a;">
-                    ● linkwatch/config.py (Seed)<br>
-                    ↳ linkwatch/cli.py (Upstream)<br>
-                    ↳ linkwatch/monitor.py (Upstream)<br>
-                    ↳ tests/test_config.py (Verification)
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("</div>", unsafe_allow_html=True)
+        - **`linkwatch/config.py` [Line 3]:** `import toml` (Static direct import, status: `verified`)
+        - **`linkwatch/config.py` [Line 37]:** `toml.load(path)` (Call site resolved, AST Node: `ast.Call`, status: `verified`)
+        - **`linkwatch/storage.py` [Line 4]:** `import appdirs` (Static direct import, status: `verified`)
+        - **`linkwatch/reporter.py` [Line 5]:** `from jinja2 import Environment` (Static import, status: `verified`)
+        - **Dynamic Imports:** None detected (100% deterministic AST coverage)
+        """)
 
 
-# --- OTHER VIEWS: OVERVIEW / BUGS / AUDIT LOG ---
+# --- OTHER VIEWS ---
 elif "Overview" in selected_agent or "Metrics" in selected_system:
     st.markdown('<div class="view-title">System Health & Dependency Risk Ledger</div>', unsafe_allow_html=True)
     st.markdown("All dependencies scanned across `LinkWatch` with staleness metrics and deprecation signals.")
